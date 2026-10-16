@@ -1,0 +1,25 @@
+{
+  "uid": "supertext_translation",
+  "type": "app",
+  "config": {
+    "name": "Supertext Translation",
+    "description": "Translate website pages, landing pages, blog posts, marketing emails and knowledge base articles with Supertext AI. Each language becomes a draft version in HubSpot for you to review and publish.",
+    "distribution": "marketplace",
+    "auth": {
+      "type": "oauth",
+      "redirectUrls": [
+        "https://REPLACE-WITH-APP_URL/oauth/callback",
+        "http://localhost:8080/oauth/callback"
+      ],
+      "requiredScopes": ["oauth", "content"],
+      "optionalScopes": ["cms.knowledge_base.articles.read", "cms.knowledge_base.articles.write"],
+      "conditionallyRequiredScopes": []
+    },
+    "permittedUrls": { "fetch": [], "iframe": [], "img": [] },
+    "support": {
+      "supportEmail": "support@supertext.com",
+      "documentationUrl": "https://github.com/Supertext/HubSpot-Supertext-Translation/blob/main/docs/INSTALLATION.md",
+      "supportUrl": "https://www.supertext.com"
+    }
+  }
+}

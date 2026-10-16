@@ -1,0 +1,9 @@
+# Local app and stand-ins (docs and examples)
+^https?://127\.0\.0\.1
+^https?://localhost
+# APIs and OAuth endpoints answer 401/404/405 without credentials
+^https://api\.supertext\.com/
+^https://api\.hubapi\.com/
+^https://app\.hubspot\.com/oauth/
+# HubSpot's app (needs a login)
+^https://app(-[a-z0-9]+)?\.hubspot\.com/

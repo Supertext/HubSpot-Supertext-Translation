@@ -1,0 +1,20 @@
+# Supertext Translation for HubSpot: the app (runs on Railway).
+FROM node:22-alpine
+
+WORKDIR /app
+
+COPY package.json package-lock.json ./
+# The Supertext SDK and Supertext Plugin Health are file: dependencies (see docs/DEVELOPER.md → Supertext SDK).
+COPY vendor ./vendor
+RUN PLAYWRIGHT_SKIP_BROWSER_DOWNLOAD=1 npm ci && npm cache clean --force
+
+COPY tsconfig.json tsconfig.build.json ./
+COPY src ./src
+COPY public ./public
+RUN npm run build && npm prune --omit=dev
+
+ENV NODE_ENV=production
+EXPOSE 8080
+# Creates its database on the shared Postgres server if needed and serves the
+# pages and the API for the translate page.
+CMD ["node", "dist/server.js"]
