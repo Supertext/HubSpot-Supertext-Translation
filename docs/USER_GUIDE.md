@@ -11,7 +11,7 @@ For editors. Once the app is set up (see [INSTALLATION.md](INSTALLATION.md)), yo
 3. Under **Choose the languages**, tick the languages. The code next to each (e.g. `de-CH`) is the variant Supertext translates into.
 4. Click **Translate into 2 languages with Supertext**.
 
-   ![Translate with Supertext: Website pages, the page About us selected, no versions yet; Swiss French and Swiss High German ticked, German and Italian (Switzerland) not; Update existing versions off; the button Translate into 2 languages with Supertext](images/translate-page.png)
+   ![Translate with Supertext: Website pages, the page About us selected, no versions yet; Swiss French and Swiss High German ticked, German and Italian (Switzerland) not; Update existing versions ticked, with its warning; the button Translate into 2 languages with Supertext](images/translate-page.png)
 
 5. Each language takes a few seconds. The **Translation** box shows the result per language, with a link to each draft in HubSpot. You can leave the page meanwhile; the translation goes on.
 
@@ -42,9 +42,9 @@ Everything is a **draft**: nothing is visible on your website or sent to anyone 
 
 ## Existing versions
 
-Languages that have a version already are **kept** (*Version exists, kept*). To replace their drafts with a fresh translation, tick **Update existing versions**. The page warns you first: changes made by hand in HubSpot are lost. A published page keeps its live version until you publish the new draft.
+Languages that have a version already get a **fresh translation**: **Update existing versions** is ticked when the page opens, and the warning under it reminds you that changes made by hand in HubSpot are replaced. A published page keeps its live version until you publish the new draft. To keep the versions you have (for example after editing a translation by hand), untick it: those languages are then **kept** (*Version exists, kept*) and only missing languages are translated.
 
-![Update existing versions ticked, with the warning that the drafts of the existing versions will be replaced, including changes made by hand in HubSpot](images/overwrite-warning.png)
+![Update existing versions ticked, as it is when the page opens, with the warning that the drafts of the existing versions will be replaced, including changes made by hand in HubSpot](images/overwrite-warning.png)
 
 An email copy that was sent already is never changed: the next translation makes a new copy.
 

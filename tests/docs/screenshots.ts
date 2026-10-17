@@ -96,7 +96,7 @@ async function main() {
   await shot('translated-state', page.locator('table.items'));
 
   // Updating existing versions: the warning.
-  await page.check('#overwrite');
+  // Update existing versions is ticked by default, with its warning.
   await shot('overwrite-warning', page.locator('#translate-form'));
 
   // A marketing email, translated into three languages.

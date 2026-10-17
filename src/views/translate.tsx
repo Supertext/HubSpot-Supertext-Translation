@@ -140,13 +140,13 @@ export function TranslatePage(props: TranslatePageProps) {
               </div>
 
               <label class="inline overwrite">
-                <input type="checkbox" id="overwrite" name="overwrite" />
+                <input type="checkbox" id="overwrite" name="overwrite" checked />
                 {t.t('translate.overwrite')}
               </label>
-              <p class="help" id="overwrite-hint">
+              <p class="help" id="overwrite-hint" hidden>
                 {t.t('translate.overwriteHint')}
               </p>
-              <div id="overwrite-warning" class="notice warning" hidden>
+              <div id="overwrite-warning" class="notice warning">
                 {t.t('translate.overwriteWarning')}
               </div>
 
