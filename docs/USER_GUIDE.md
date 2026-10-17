@@ -25,7 +25,7 @@ Marketing emails work the same way; each language gets its own copy of the email
 
 ![Marketing emails: the Autumn newsletter translated into Italian (Switzerland), Swiss French and Swiss High German, three new versions, and the About us page under Recent translations](images/email-results.png)
 
-The app's pages are in English, German, French or Italian; switch at the top right.
+The app's pages are in English, German, French or Italian; switch at the top right. They work on a phone too: on a small screen the list of content scrolls sideways to show all your languages.
 
 ![The translate page in German: Blogbeiträge, the post How we roast our cocoa beans selected, Sprachen auswählen and the button In 3 Sprachen mit Supertext übersetzen](images/translate-page-de.png)
 

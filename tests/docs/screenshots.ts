@@ -114,6 +114,17 @@ async function main() {
   await page.uncheck('input[name="language"][value="de"]');
   await shot('translate-page-de', page.locator('#translate-form'));
 
+  // Phones: every page must fit a 390 px wide screen (wide tables scroll inside their card).
+  const phone = await browser.newPage({ viewport: { width: 390, height: 844 }, deviceScaleFactor: 1, isMobile: true, hasTouch: true });
+  await phone.context().addCookies(await page.context().cookies());
+  for (const path of ['/?lang=en', '/?kind=email', '/settings']) {
+    await phone.goto(`${appUrl}${path}`);
+    const width = await phone.evaluate(() => document.documentElement.scrollWidth);
+    if (width > 390) throw new Error(`${path} is ${width}px wide on a phone (390px screen)`);
+  }
+  await phone.click('form.settings button.primary', { trial: true });
+  console.log('phone layout: all pages fit 390px');
+
   await browser.close();
   process.exit(0);
 }

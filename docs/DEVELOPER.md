@@ -173,7 +173,7 @@ The protocol itself (multipart, retries, polling, packing, language codes, error
 npm run docs:screenshots   # Playwright, 1× scale, into docs/images/
 ```
 
-`tests/docs/screenshots.ts` starts the stand-ins and the app in-process, connects through the stand-in's OAuth and captures the app's pages (connect, settings, translate page, results, list afterwards, update warning, email results, German UI). Editor links point at app.hubspot.com, never at the stand-in. Regenerate them in the same commit as any UI change they show. Chromium: Playwright's own (`npx playwright install chromium`) or `CHROME=/path/to/chrome`. Screenshots of HubSpot's own screens (language settings, a translated variant in the page editor) follow from the demo account.
+`tests/docs/screenshots.ts` starts the stand-ins and the app in-process, connects through the stand-in's OAuth and captures the app's pages (connect, settings, translate page, results, list afterwards, update warning, email results, German UI). It also checks that every page fits a 390 px phone screen and fails if one is wider. Editor links point at app.hubspot.com, never at the stand-in. Regenerate them in the same commit as any UI change they show. Chromium: Playwright's own (`npx playwright install chromium`) or `CHROME=/path/to/chrome`. Screenshots of HubSpot's own screens (language settings, a translated variant in the page editor) follow from the demo account.
 
 ## CI
 

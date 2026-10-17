@@ -62,6 +62,7 @@ export function TranslatePage(props: TranslatePageProps) {
           {rows && rows.length === 0 && <p class="muted">{t.t('translate.empty')}</p>}
           {rows && rows.length > 0 && (
             <>
+              <div class="table-scroll">
               <table class="items">
                 <thead>
                   <tr>
@@ -107,6 +108,7 @@ export function TranslatePage(props: TranslatePageProps) {
                   ))}
                 </tbody>
               </table>
+              </div>
               <div class="pager">
                 <span class="spacer"></span>
                 {props.paged && <a href={appUrl('/', { kind })}>{t.t('translate.firstPage')}</a>}
