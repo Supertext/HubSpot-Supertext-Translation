@@ -249,7 +249,8 @@ Never tag or create releases by hand.
 
 ## Known limitations / roadmap
 
-- **Not yet tested on a real HubSpot account.** The app follows HubSpot's API reference (2026-09 and the knowledge base beta); check these with `npm run hubspot:probe` on the demo account, and adapt the code if HubSpot differs:
+- **Confirmed on a real HubSpot account (17 October 2026, account 149573099, EU data centre):** installing through OAuth (`/oauth/2026-09/token`, token introspection, the optional knowledge base scopes), token refresh, listing blog posts, a blog post into a language its blog has (`create-language-variation`, then `PATCH …/draft`: the French variant appears in HubSpot with the translated text), updating that draft again, and HubSpot's refusal for a language the blog doesn't have (*Blog does not have a variation for language de-ch*, now `blogLanguageMissing`). The developer account must have signed the Acceptable Use Policy first (see *Registering the app in HubSpot*).
+- **Not yet tested on a real HubSpot account:** website and landing pages, marketing emails and the knowledge base. The app follows HubSpot's API reference (2026-09 and the knowledge base beta); check these with `npm run hubspot:probe` on the demo account, and adapt the code if HubSpot differs:
   - the shape of `translations` on pages, posts and articles, and that `create-language-variation` copies the draft and accepts `primaryLanguage`;
   - which module fields real themes use for text (the walker's `TEXT_KEY` list) and that `PATCH …/draft` with whole `widgets` / `layoutSections` objects keeps the page editable in the drag-and-drop editor;
   - that `PATCH …/draft` of an email with the whole `content` object works, and where the preview text lives in emails made with the drag-and-drop editor;
