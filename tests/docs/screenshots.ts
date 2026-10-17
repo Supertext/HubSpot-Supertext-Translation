@@ -68,7 +68,21 @@ async function main() {
   await page.fill('input[name="apiKey"]', 'Supertext-Auth-Key 0123456789abcdef');
   await page.selectOption('select[name="sourceLanguage"]', 'en');
   for (const code of ['de-ch', 'fr-ch', 'it-ch', 'de']) await page.check(`#t-${code}`);
-  await page.selectOption('select[name="code:de"]', 'de-DE');
+  // The Supertext code is a searchable dropdown: type part of a name or code.
+  const combo = page.locator('#targets tr:has(#t-de) .combo-input');
+  await combo.click();
+  await combo.fill('ger');
+  await page.waitForSelector('#targets tr:has(#t-de) .combo-list:not([hidden])');
+  const rowBox = (await page.locator('#targets tr:has(#t-de)').boundingBox())!;
+  const listBox = (await page.locator('#targets tr:has(#t-de) .combo-list').boundingBox())!;
+  await page.screenshot({
+    path: `${out}settings-code-search.png`,
+    clip: { x: rowBox.x - 8, y: rowBox.y - 8, width: rowBox.width + 16, height: listBox.y + listBox.height - rowBox.y + 16 },
+  });
+  console.log('docs/images/settings-code-search.png');
+  await combo.fill('germany');
+  await combo.press('Enter');
+  if ((await page.inputValue('select[name="code:de"]')) !== 'de-DE') throw new Error('the dropdown did not choose de-DE');
   await page.click('button.primary');
   await page.waitForSelector('.notice.success');
   await page.click('#test-button');

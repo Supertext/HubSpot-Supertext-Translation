@@ -115,6 +115,8 @@ export const en = {
     'Choose the language Supertext translates into for each language, for example Swiss High German (de-CH) for German. Variants of the same language come first. Each language starts with its suggestion: the same code where HubSpot\'s code is already a Supertext code (de-ch, es, nl), else the usual variant (German → de-DE, English → en-US, Chinese (China) → zh-Hans, Spanish (Mexico) → es). A language without a suggestion shows — choose — and isn\'t translated until you pick its code.',
   'settings.languages.suggested': 'Suggested',
   'settings.languages.all': 'All Supertext languages',
+  'settings.languages.search': 'Type a name or code',
+  'settings.languages.noMatch': 'No Supertext language matches',
   'settings.languages.choose':
     '— choose —',
   'settings.languages.unmapped':

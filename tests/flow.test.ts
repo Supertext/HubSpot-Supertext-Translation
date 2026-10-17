@@ -301,6 +301,7 @@ describe('languages', () => {
     expect(row('zh-cn')).toMatch(/Suggested[\s\S]*zh-Hans[\s\S]*zh-Hant[\s\S]*All Supertext/);
     expect(row('fr-be')).toContain('<option value="" selected="">— choose —');
     expect(html).not.toContain('<datalist');
+    expect(row('de')).toContain('data-combobox');
   });
 });
 

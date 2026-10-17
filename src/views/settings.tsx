@@ -201,6 +201,9 @@ export function SettingsPage(props: SettingsPageProps) {
                       <select
                         name={`code:${code}`}
                         class={selected ? '' : 'missing'}
+                        data-combobox
+                        data-placeholder={t.t('settings.languages.search')}
+                        data-no-match={t.t('settings.languages.noMatch')}
                         aria-label={`${t.t('settings.languages.code')}: ${languageName(code, t.locale)}`}
                       >
                         {!selected && (

@@ -107,6 +107,8 @@ export const it: Messages = {
     'Scelga per ogni lingua in quale lingua traduce Supertext, per esempio Alto tedesco svizzero (de-CH) per il tedesco. Le varianti della stessa lingua sono in cima. Ogni lingua è preselezionata con un suggerimento: lo stesso codice se il codice HubSpot è già un codice Supertext (de-ch, es, nl), altrimenti la variante usuale (tedesco → de-DE, inglese → en-US, cinese (Cina) → zh-Hans, spagnolo (Messico) → es). Una lingua senza suggerimento mostra — scegliere — e viene tradotta solo dopo che avrà scelto il suo codice.',
   'settings.languages.suggested': 'Suggerite',
   'settings.languages.all': 'Tutte le lingue Supertext',
+  'settings.languages.search': 'Digiti un nome o un codice',
+  'settings.languages.noMatch': 'Nessuna lingua Supertext corrisponde',
   'settings.languages.choose':
     '— scegliere —',
   'settings.languages.unmapped':

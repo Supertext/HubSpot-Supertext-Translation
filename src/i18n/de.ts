@@ -110,6 +110,8 @@ export const de: Messages = {
     'Wählen Sie für jede Sprache, in welche Sprache Supertext übersetzt, zum Beispiel Schweizer Hochdeutsch (de-CH) für Deutsch. Die Varianten derselben Sprache stehen zuoberst. Vorausgewählt ist jeweils ein Vorschlag: derselbe Code, wo der HubSpot-Code bereits ein Supertext-Code ist (de-ch, es, nl), sonst die übliche Variante (Deutsch → de-DE, Englisch → en-US, Chinesisch (China) → zh-Hans, Spanisch (Mexiko) → es). Eine Sprache ohne Vorschlag zeigt — auswählen — und wird erst übersetzt, wenn Sie ihren Code wählen.',
   'settings.languages.suggested': 'Vorgeschlagen',
   'settings.languages.all': 'Alle Supertext-Sprachen',
+  'settings.languages.search': 'Name oder Code eingeben',
+  'settings.languages.noMatch': 'Keine Supertext-Sprache gefunden',
   'settings.languages.choose':
     '— auswählen —',
   'settings.languages.unmapped':
