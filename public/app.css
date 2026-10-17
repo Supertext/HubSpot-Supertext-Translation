@@ -126,7 +126,7 @@ a.badge.done:hover { text-decoration: none; background: var(--mint-hover); }
 
 .codes td { padding: 6px 10px; }
 .codes tr.other td { color: var(--muted); }
-.codes tr.other input:not([type]) { opacity: .5; }
+.codes tr.other select { opacity: .55; }
 #test-result.ok { color: var(--text); font-weight: 600; }
 #test-result.failed { color: var(--red); }
 .about p, .connection p { margin: 0; }
@@ -142,7 +142,9 @@ td.lang { font-size: 12px; color: var(--muted); white-space: nowrap; }
 .table-scroll { overflow-x: auto; -webkit-overflow-scrolling: touch; margin: 0 -4px; padding: 0 4px; }
 .table-scroll table.items th, .table-scroll table.items td { white-space: nowrap; }
 .table-scroll table.items td.title { white-space: normal; min-width: 160px; }
-.codes input:not([type]) { width: 100%; min-width: 0; }
+.codes select { width: 100%; min-width: 0; max-width: 340px; }
+.codes select.missing { border-color: var(--orange); color: var(--orange); }
+.codes .hs-code { display: block; font-size: 12px; color: var(--muted); }
 html { -webkit-text-size-adjust: 100%; }
 body { overflow-x: hidden; }
 
@@ -168,17 +170,16 @@ body { overflow-x: hidden; }
   .language { width: 100%; }
   .kinds { flex-wrap: nowrap; overflow-x: auto; margin: 0 -16px 16px; padding: 0 16px; }
   .kinds a { white-space: nowrap; flex: none; }
-  /* Languages table: checkbox, name and code; what is sent goes under the name. */
+  /* Languages table: checkbox and name, the Supertext code below. */
   .codes thead { display: none; }
-  .codes tr { display: grid; grid-template-columns: 32px 1fr 108px; grid-template-areas: "check name code" "check sent code"; column-gap: 8px; align-items: center; padding: 8px 0; border-bottom: 1px solid var(--line); }
+  .codes tr { display: grid; grid-template-columns: 32px 1fr; grid-template-areas: "check name" "check code"; column-gap: 8px; row-gap: 6px; align-items: center; padding: 10px 0; border-bottom: 1px solid var(--line); }
   .codes tr:last-child { border-bottom: 0; }
   .codes td { padding: 0; border: 0; }
-  .codes td:nth-child(1) { grid-area: check; }
+  .codes td:nth-child(1) { grid-area: check; align-self: start; padding-top: 3px; }
   .codes td:nth-child(2) { grid-area: name; }
+  .codes td:nth-child(2) .hs-code { display: inline; margin-left: 6px; }
   .codes td:nth-child(3) { grid-area: code; }
-  .codes td:nth-child(4) { grid-area: sent; font-size: 12px; color: var(--muted); }
-  .codes td:nth-child(4) code { font-size: 11px; padding: 1px 4px; }
-  .codes input:not([type]) { font-size: 15px; padding: 6px 8px; min-height: 36px; }
+  .codes select { max-width: none; font-size: 15px; min-height: 40px; }
   table.results, table.results tbody { display: block; }
   table.results tr { display: flex; flex-wrap: wrap; gap: 2px 12px; padding: 10px 0; border-bottom: 1px solid var(--line); }
   table.results tr:last-child { border-bottom: 0; }

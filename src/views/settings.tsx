@@ -8,7 +8,9 @@ import {
   languageName,
   resolvedTarget,
   SUPERTEXT_TARGETS,
+  suggestedTargets,
   supertextCodeOf,
+  supertextName,
   supertextSource,
   supportsPoliteness,
 } from '../translation/languages.js';
@@ -169,14 +171,22 @@ export function SettingsPage(props: SettingsPageProps) {
                 <th></th>
                 <th></th>
                 <th>{t.t('settings.languages.code')}</th>
-                <th>{t.t('settings.languages.sent')}</th>
               </tr>
             </thead>
             <tbody>
               {ordered.map((code) => {
                 const chosen = account.targets.includes(code);
                 const exact = supertextCodeOf(code);
-                const sent = resolvedTarget(code, account.languageCodes);
+                const mapped = account.languageCodes[code] ?? '';
+                const suggested = suggestedTargets(code);
+                const others = SUPERTEXT_TARGETS.filter((target) => !suggested.includes(target)).sort((a, b) =>
+                  supertextName(a, t.locale).localeCompare(supertextName(b, t.locale), t.locale),
+                );
+                const option = (target: string) => (
+                  <option value={target} selected={mapped === target}>
+                    {supertextName(target, t.locale)} · {target}
+                  </option>
+                );
                 return (
                   <tr class={chosen ? 'chosen' : 'other'}>
                     <td class="check">
@@ -184,30 +194,26 @@ export function SettingsPage(props: SettingsPageProps) {
                     </td>
                     <td>
                       <label for={`t-${code}`}>{languageName(code, t.locale)}</label>
+                      <span class="hs-code">{code}</span>
                     </td>
                     <td>
-                      <input
+                      <select
                         name={`code:${code}`}
-                        value={account.languageCodes[code] ?? ''}
-                        placeholder={exact ?? ''}
-                        list="supertext-codes"
-                        size={14}
+                        class={!mapped && !exact ? 'missing' : ''}
                         aria-label={`${t.t('settings.languages.code')}: ${languageName(code, t.locale)}`}
-                      />
-                    </td>
-                    <td class={sent ? 'sent' : 'sent missing'}>
-                      {sent ? <code>{sent}</code> : t.t('settings.languages.notMapped')}
+                      >
+                        <option value="" selected={!mapped}>
+                          {exact ? t.t('settings.languages.same', { code: exact }) : t.t('settings.languages.notMapped')}
+                        </option>
+                        {suggested.length > 0 && <optgroup label={t.t('settings.languages.suggested')}>{suggested.map(option)}</optgroup>}
+                        <optgroup label={t.t('settings.languages.all')}>{others.map(option)}</optgroup>
+                      </select>
                     </td>
                   </tr>
                 );
               })}
             </tbody>
           </table>
-          <datalist id="supertext-codes">
-            {SUPERTEXT_TARGETS.map((code) => (
-              <option value={code} />
-            ))}
-          </datalist>
           <p class="help">{t.t('settings.languages.blogHint')}</p>
         </section>
 

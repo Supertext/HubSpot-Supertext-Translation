@@ -107,8 +107,10 @@ export const de: Messages = {
   'settings.languages.targets': 'Übersetzen in',
   'settings.languages.code': 'Supertext-Code',
   'settings.languages.codeHint':
-    'Geben Sie für jede Zielsprache den Code ein, den Supertext verwendet, zum Beispiel de-CH für Deutsch (Schweiz), en-US für Englisch (USA) oder zh-Hans für vereinfachtes Chinesisch. Eine Sprache, deren HubSpot-Code bereits ein Supertext-Code ist (de-ch, es, nl), braucht keinen. Eine Sprache ohne Code wird nicht übersetzt.',
-  'settings.languages.sent': 'An Supertext gesendet',
+    'Wählen Sie für jede Sprache, in welche Sprache Supertext übersetzt, zum Beispiel Schweizer Hochdeutsch · de-CH für Deutsch. Die Varianten derselben Sprache stehen zuoberst. Ist der HubSpot-Code bereits ein Supertext-Code (de-ch, es, nl), genügt Wie in HubSpot. Eine Sprache mit Nicht festgelegt wird nicht übersetzt.',
+  'settings.languages.same': 'Wie in HubSpot ({code})',
+  'settings.languages.suggested': 'Vorgeschlagen',
+  'settings.languages.all': 'Alle Supertext-Sprachen',
   'settings.languages.notMapped': 'Nicht festgelegt',
   'settings.languages.unmapped':
     'Diese Sprachen haben noch keinen Supertext-Code und werden erst übersetzt, wenn Sie unter Sprachen einen eingeben: {languages}.',

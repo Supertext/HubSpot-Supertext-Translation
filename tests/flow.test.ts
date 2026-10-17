@@ -285,6 +285,20 @@ describe('languages', () => {
     expect(saved.headers.get('location')).toContain('invalid=de-XX');
     expect((await env.store.getAccount(PORTAL_ID))!.languageCodes).toEqual({});
   });
+
+  it('offers the Supertext codes as a dropdown, the same language first', async () => {
+    const env = setup();
+    await env.connect();
+    await env.saveSettings([['target', 'de'], ['target', 'de-ch'], ['code:de', 'de-DE']]);
+    const html = await (await env.request('/settings')).text();
+    const row = (code: string) => html.slice(html.indexOf(`name="code:${code}"`), html.indexOf('</select>', html.indexOf(`name="code:${code}"`)));
+    expect(row('de')).toContain('<option value="de-DE" selected');
+    expect(row('de').indexOf('gsw-u-sd-chzh')).toBeLessThan(row('de').indexOf('All Supertext languages'));
+    expect(row('de-ch')).toContain('Same as in HubSpot (de-CH)');
+    expect(row('zh-cn')).toContain('Not set');
+    expect(row('zh-cn')).toMatch(/Suggested[\s\S]*zh-Hans[\s\S]*zh-Hant[\s\S]*All Supertext/);
+    expect(html).not.toContain('<datalist');
+  });
 });
 
 describe('interface language', () => {

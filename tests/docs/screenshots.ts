@@ -68,7 +68,7 @@ async function main() {
   await page.fill('input[name="apiKey"]', 'Supertext-Auth-Key 0123456789abcdef');
   await page.selectOption('select[name="sourceLanguage"]', 'en');
   for (const code of ['de-ch', 'fr-ch', 'it-ch', 'de']) await page.check(`#t-${code}`);
-  await page.fill('input[name="code:de"]', 'de-DE');
+  await page.selectOption('select[name="code:de"]', 'de-DE');
   await page.click('button.primary');
   await page.waitForSelector('.notice.success');
   await page.click('#test-button');

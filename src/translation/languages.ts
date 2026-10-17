@@ -72,3 +72,22 @@ export const supertextSource = (language: string, mapping: LanguageMapping): str
 
 /** Whether Supertext offers formal and informal address for this target code. */
 export const supportsPoliteness = (target: string): boolean => Languages.supportsPoliteness(target) === true;
+
+const DIALECT_PLACES: Record<string, string> = { chzh: 'Zürich', chbe: 'Bern' };
+
+/** A Supertext target code's name in the interface language ("de-CH" → "German (Switzerland)", "gsw-u-sd-chzh" → "Swiss German (Zürich)"). */
+export function supertextName(code: string, uiLocale: string): string {
+  const dialect = /^gsw-u-sd-(\w+)$/.exec(code);
+  if (dialect) return `${languageName('gsw', uiLocale)} (${DIALECT_PLACES[dialect[1]] ?? dialect[1]})`;
+  return languageName(code, uiLocale);
+}
+
+/**
+ * Supertext's target codes for a HubSpot language, for the dropdown: the codes of the same
+ * language first ("de" → de-CH, de-DE, de-AT and the Swiss German dialects; "no" → nb).
+ */
+export function suggestedTargets(language: string): string[] {
+  const base = hubspotCode(language).split('-')[0];
+  const bases = base === 'no' ? ['nb', 'no'] : base === 'de' ? ['de', 'gsw'] : [base];
+  return SUPERTEXT_TARGETS.filter((code) => bases.includes(code.split('-')[0].toLowerCase()));
+}

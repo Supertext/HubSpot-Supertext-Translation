@@ -112,8 +112,10 @@ export const en = {
   'settings.languages.targets': 'Translate into',
   'settings.languages.code': 'Supertext code',
   'settings.languages.codeHint':
-    'Enter the code Supertext uses for each language you translate into, for example de-CH for German (Switzerland), en-US for English (United States) or zh-Hans for Simplified Chinese. A language whose HubSpot code is already a Supertext code (de-ch, es, nl) needs none. A language without one isn\'t translated.',
-  'settings.languages.sent': 'Sent to Supertext',
+    'Choose the language Supertext translates into for each language, for example Swiss High German · de-CH for German. Variants of the same language come first. Where HubSpot\'s code is already a Supertext code (de-ch, es, nl), Same as in HubSpot is enough. A language set to Not set isn\'t translated.',
+  'settings.languages.same': 'Same as in HubSpot ({code})',
+  'settings.languages.suggested': 'Suggested',
+  'settings.languages.all': 'All Supertext languages',
   'settings.languages.notMapped': 'Not set',
   'settings.languages.unmapped':
     "These languages have no Supertext code yet and aren't translated until you enter one under Languages: {languages}.",
