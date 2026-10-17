@@ -9,7 +9,7 @@ import {
   resolvedTarget,
   SUPERTEXT_TARGETS,
   suggestedTargets,
-  supertextCodeOf,
+  suggestedTarget,
   supertextName,
   supertextSource,
   supportsPoliteness,
@@ -176,15 +176,16 @@ export function SettingsPage(props: SettingsPageProps) {
             <tbody>
               {ordered.map((code) => {
                 const chosen = account.targets.includes(code);
-                const exact = supertextCodeOf(code);
-                const mapped = account.languageCodes[code] ?? '';
+                const saved = account.languageCodes[code] ?? '';
+                // The saved code, else the exact match or the SDK's default, else "— choose —".
+                const selected = saved || suggestedTarget(code) || '';
                 const suggested = suggestedTargets(code);
                 const others = SUPERTEXT_TARGETS.filter((target) => !suggested.includes(target)).sort((a, b) =>
                   supertextName(a, t.locale).localeCompare(supertextName(b, t.locale), t.locale),
                 );
                 const option = (target: string) => (
-                  <option value={target} selected={mapped === target}>
-                    {supertextName(target, t.locale)} · {target}
+                  <option value={target} selected={selected === target}>
+                    {supertextName(target, t.locale)} ({target})
                   </option>
                 );
                 return (
@@ -199,12 +200,14 @@ export function SettingsPage(props: SettingsPageProps) {
                     <td>
                       <select
                         name={`code:${code}`}
-                        class={!mapped && !exact ? 'missing' : ''}
+                        class={selected ? '' : 'missing'}
                         aria-label={`${t.t('settings.languages.code')}: ${languageName(code, t.locale)}`}
                       >
-                        <option value="" selected={!mapped}>
-                          {exact ? t.t('settings.languages.same', { code: exact }) : t.t('settings.languages.notMapped')}
-                        </option>
+                        {!selected && (
+                          <option value="" selected>
+                            {t.t('settings.languages.choose')}
+                          </option>
+                        )}
                         {suggested.length > 0 && <optgroup label={t.t('settings.languages.suggested')}>{suggested.map(option)}</optgroup>}
                         <optgroup label={t.t('settings.languages.all')}>{others.map(option)}</optgroup>
                       </select>

@@ -127,7 +127,7 @@ export function fromSdk(error: unknown): unknown {
       const code = error.targetLang ?? error.sourceLang ?? '';
       return make(
         'unsupportedLanguage',
-        `The language "${code}" has no Supertext language yet. Set its Supertext code under Settings → Languages.`,
+        `The language "${code}" has no Supertext code yet. Choose one in the Supertext code dropdown under Settings → Languages.`,
         { code },
         false,
       );

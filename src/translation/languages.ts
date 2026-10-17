@@ -5,11 +5,13 @@
 // keyed by it. Supertext accepts only the codes its `GET features` lists (the
 // SDK's `Languages`): targets regional only for de/en/fr/it/pt ("de-CH"),
 // script for zh/sr ("zh-Hans"), bare for the rest ("es", "nl"); sources bare
-// ("en"). Nothing is guessed: the account's own Supertext code for the language
-// (Settings → Languages) wins, else a HubSpot code that is a Supertext code as
-// it is ("de-ch" → "de-CH", "es"), else the SDK's error `unsupported_language`
-// and nothing is sent. One mapping serves both directions (`de-CH` as a source
-// is sent as `de`).
+// ("en"). The account's own Supertext code for the language (the dropdown under
+// Settings → Languages) wins, else a HubSpot code that is a Supertext code as it
+// is ("de-ch" → "de-CH", "es"), else the SDK's default where one is obvious
+// ("de" → "de-DE", "en" → "en-US", "zh-cn" → "zh-Hans", "es-mx" → "es"), else
+// the SDK's error `unsupported_language` and nothing is sent ("no", "fr-be",
+// "en-au" need a mapping). One mapping serves both directions (`de-CH` as a
+// source is sent as `de`).
 
 import { Languages, type LanguageMapping } from 'supertext-sdk/v1';
 
@@ -41,14 +43,21 @@ export function languageName(code: string, uiLocale: string): string {
   return code;
 }
 
-/** Supertext's target codes, as they are to be entered ("de-CH", "es", "zh-Hans"). */
-export const SUPERTEXT_TARGETS: readonly string[] = Languages.TARGETS.map((language) => language.code);
+/** Supertext's target codes, as they are to be chosen ("de-CH", "es", "zh-Hans"). */
+export const SUPERTEXT_TARGETS: readonly string[] = Languages.targetOptions().map((language) => language.code);
+
+/**
+ * What the dropdown preselects for a HubSpot language nobody mapped yet: the exact match,
+ * else the SDK's default ("de" → "de-DE"), else null ("— choose —").
+ */
+export const suggestedTarget = (language: string): string | null => Languages.suggestTarget(language);
 
 /** A typed Supertext code in its exact form ("de_ch" → "de-CH"), or null if Supertext doesn't offer it. */
 export const supertextCodeOf = (code: string): string | null => Languages.matchTarget(code.trim());
 
 /**
- * The target code sent for a HubSpot language: the account's mapping, else an exact match.
+ * The target code sent for a HubSpot language: the account's mapping, else an exact match,
+ * else the SDK's default.
  * Throws the SDK's `unsupported_language` error otherwise (see supertext/client.ts → fromSdk).
  */
 export const supertextTarget = (language: string, mapping: LanguageMapping): string => Languages.target(language, mapping);

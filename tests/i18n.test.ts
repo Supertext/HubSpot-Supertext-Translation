@@ -83,24 +83,27 @@ describe('languages', () => {
     expect(languageName('zh-tw', 'de')).toMatch(/Chinesisch/);
   });
 
-  it("sends the account's Supertext code, else an exact match, and never guesses a region", () => {
+  it("sends the account's Supertext code, else an exact match, else the SDK's default", () => {
     expect(supertextTarget('de-ch', {})).toBe('de-CH');
     expect(supertextTarget('de', { de: 'de-CH' })).toBe('de-CH');
     expect(supertextTarget('es', {})).toBe('es');
     expect(supertextTarget('zh-cn', { 'zh-cn': 'zh-Hans' })).toBe('zh-Hans');
-    expect(resolvedTarget('de', {})).toBeNull();
-    expect(resolvedTarget('zh-cn', {})).toBeNull();
+    expect(resolvedTarget('de', {})).toBe('de-DE');
+    expect(resolvedTarget('zh-cn', {})).toBe('zh-Hans');
+    expect(resolvedTarget('es-mx', {})).toBe('es');
+    expect(resolvedTarget('no', {})).toBeNull();
+    expect(resolvedTarget('fr-be', {})).toBeNull();
     expect(resolvedTarget('no', { no: 'nb' })).toBe('nb');
     const error = (() => {
       try {
-        supertextTarget('fr', {});
+        supertextTarget('fr-be', {});
       } catch (caught) {
         return fromSdk(caught) as { message: string; code: string; params: Record<string, string> };
       }
     })();
     expect(error?.code).toBe('unsupportedLanguage');
-    expect(error?.params).toEqual({ code: 'fr' });
-    expect(translator('it').error(error!)).toContain('«fr»');
+    expect(error?.params).toEqual({ code: 'fr-be' });
+    expect(translator('it').error(error!)).toContain('«fr-be»');
   });
 
   it('accepts only Supertext codes as the mapping, in their exact form', () => {

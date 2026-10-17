@@ -107,13 +107,13 @@ export const de: Messages = {
   'settings.languages.targets': 'Übersetzen in',
   'settings.languages.code': 'Supertext-Code',
   'settings.languages.codeHint':
-    'Wählen Sie für jede Sprache, in welche Sprache Supertext übersetzt, zum Beispiel Schweizer Hochdeutsch · de-CH für Deutsch. Die Varianten derselben Sprache stehen zuoberst. Ist der HubSpot-Code bereits ein Supertext-Code (de-ch, es, nl), genügt Wie in HubSpot. Eine Sprache mit Nicht festgelegt wird nicht übersetzt.',
-  'settings.languages.same': 'Wie in HubSpot ({code})',
+    'Wählen Sie für jede Sprache, in welche Sprache Supertext übersetzt, zum Beispiel Schweizer Hochdeutsch (de-CH) für Deutsch. Die Varianten derselben Sprache stehen zuoberst. Vorausgewählt ist jeweils ein Vorschlag: derselbe Code, wo der HubSpot-Code bereits ein Supertext-Code ist (de-ch, es, nl), sonst die übliche Variante (Deutsch → de-DE, Englisch → en-US, Chinesisch (China) → zh-Hans, Spanisch (Mexiko) → es). Eine Sprache ohne Vorschlag zeigt — auswählen — und wird erst übersetzt, wenn Sie ihren Code wählen.',
   'settings.languages.suggested': 'Vorgeschlagen',
   'settings.languages.all': 'Alle Supertext-Sprachen',
-  'settings.languages.notMapped': 'Nicht festgelegt',
+  'settings.languages.choose':
+    '— auswählen —',
   'settings.languages.unmapped':
-    'Diese Sprachen haben noch keinen Supertext-Code und werden erst übersetzt, wenn Sie unter Sprachen einen eingeben: {languages}.',
+    'Diese Sprachen haben noch keinen Supertext-Code und werden erst übersetzt, wenn Sie unter Sprachen in der Spalte Supertext-Code einen auswählen: {languages}.',
   'settings.languages.sourceUnsupported':
     'Supertext kennt {language} nicht als Sprache Ihrer Inhalte. Geben Sie unter Sprachen ihren Supertext-Code ein (zum Beispiel en-US für Englisch) oder lassen Sie Supertext sie erkennen.',
   'settings.languages.blogHint':
@@ -170,7 +170,7 @@ export const de: Messages = {
     'Supertext übersetzt nicht in diese Sprache. Prüfen Sie ihren Supertext-Code unter Einstellungen → Sprachen (zum Beispiel de-CH oder es).',
   'error.incomplete': 'Supertext hat eine unvollständige Übersetzung zurückgegeben; für diese Sprache wurde nichts gespeichert.',
   'error.unsupportedLanguage':
-    'Die Sprache «{code}» hat noch keinen Supertext-Code, deshalb wurde nichts gesendet. Bitten Sie Ihre Administratorin oder Ihren Administrator, ihn unter Einstellungen → Sprachen festzulegen (zum Beispiel de-CH oder es).',
+    'Die Sprache «{code}» hat noch keinen Supertext-Code, deshalb wurde nichts gesendet. Bitten Sie Ihre Administratorin oder Ihren Administrator, ihn unter Einstellungen → Sprachen in der Auswahlliste Supertext-Code auszuwählen.',
   'error.unsupportedFeature':
     'Supertext bietet für diese Sprache keine formelle oder informelle Anrede an. Stellen Sie die Anrede unter Einstellungen → Übersetzung auf «Supertext entscheiden lassen».',
   'error.hublTags':

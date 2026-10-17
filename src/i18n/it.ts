@@ -104,13 +104,13 @@ export const it: Messages = {
   'settings.languages.targets': 'Traduci in',
   'settings.languages.code': 'Codice Supertext',
   'settings.languages.codeHint':
-    'Scelga per ogni lingua in quale lingua traduce Supertext, per esempio Alto tedesco svizzero · de-CH per il tedesco. Le varianti della stessa lingua sono in cima. Se il codice HubSpot è già un codice Supertext (de-ch, es, nl), basta Come in HubSpot. Una lingua Non impostato non viene tradotta.',
-  'settings.languages.same': 'Come in HubSpot ({code})',
+    'Scelga per ogni lingua in quale lingua traduce Supertext, per esempio Alto tedesco svizzero (de-CH) per il tedesco. Le varianti della stessa lingua sono in cima. Ogni lingua è preselezionata con un suggerimento: lo stesso codice se il codice HubSpot è già un codice Supertext (de-ch, es, nl), altrimenti la variante usuale (tedesco → de-DE, inglese → en-US, cinese (Cina) → zh-Hans, spagnolo (Messico) → es). Una lingua senza suggerimento mostra — scegliere — e viene tradotta solo dopo che avrà scelto il suo codice.',
   'settings.languages.suggested': 'Suggerite',
   'settings.languages.all': 'Tutte le lingue Supertext',
-  'settings.languages.notMapped': 'Non impostato',
+  'settings.languages.choose':
+    '— scegliere —',
   'settings.languages.unmapped':
-    'Queste lingue non hanno ancora un codice Supertext e vengono tradotte solo dopo che ne avrà inserito uno in Lingue: {languages}.',
+    'Queste lingue non hanno ancora un codice Supertext e vengono tradotte solo dopo che ne avrà scelto uno nella colonna Codice Supertext in Lingue: {languages}.',
   'settings.languages.sourceUnsupported':
     'Supertext non conosce {language} come lingua dei Suoi contenuti. Inserisca il suo codice Supertext in Lingue (per esempio en-US per l’inglese) oppure lasci che Supertext la riconosca.',
   'settings.languages.blogHint':
@@ -167,7 +167,7 @@ export const it: Messages = {
     'Supertext non traduce in questa lingua. Verifichi il suo codice Supertext in Impostazioni → Lingue (per esempio de-CH o es).',
   'error.incomplete': 'Supertext ha restituito una traduzione incompleta; per questa lingua non è stato salvato nulla.',
   'error.unsupportedLanguage':
-    'La lingua «{code}» non ha ancora un codice Supertext, quindi non è stato inviato nulla. Chieda al Suo amministratore di impostarlo in Impostazioni → Lingue (per esempio de-CH o es).',
+    'La lingua «{code}» non ha ancora un codice Supertext, quindi non è stato inviato nulla. Chieda al Suo amministratore di sceglierne uno nell’elenco Codice Supertext in Impostazioni → Lingue.',
   'error.unsupportedFeature':
     'Supertext non offre una forma di cortesia formale o informale per questa lingua. Imposti la forma di cortesia su «Lasciare decidere a Supertext» in Impostazioni → Traduzione.',
   'error.hublTags':

@@ -70,7 +70,7 @@ The result shows the reason for each language that fails; the other languages st
 | --- | --- |
 | *Add your Supertext API key* | An administrator needs to enter the API key under Settings. |
 | *Authentication failed* | The API key is no longer valid; tell your administrator. |
-| *The language “de” has no Supertext code yet, so nothing was sent* | The language isn't mapped to a Supertext language yet; nothing was sent to Supertext for it, the other languages still ran. An administrator enters its Supertext code under Settings → Languages (for example `de-CH`). On the Translate page such a language shows *No Supertext code yet*. |
+| *The language “fr-be” has no Supertext code yet, so nothing was sent* | The language has no Supertext language yet (Supertext has no exact code for it and the app doesn't guess one); nothing was sent to Supertext for it, the other languages still ran. An administrator chooses its code in the *Supertext code* dropdown under Settings → Languages (for example `fr-FR`). On the Translate page such a language shows *No Supertext code yet*. |
 | *Supertext offers no formal or informal address for this language* | An administrator sets the form of address to *Let Supertext decide* under Settings → Translation. |
 | *Supertext doesn't translate into …* | An administrator checks the language's Supertext code under Settings → Languages. |
 | *Supertext returned 2 of 3 personalization tokens or HubL tags; nothing was saved for this language.* | A token got lost in the translation, so nothing was saved (a lost `{{ contact.firstname }}` would show to readers). Translate that language again. |

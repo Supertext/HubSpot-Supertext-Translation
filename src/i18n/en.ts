@@ -112,13 +112,13 @@ export const en = {
   'settings.languages.targets': 'Translate into',
   'settings.languages.code': 'Supertext code',
   'settings.languages.codeHint':
-    'Choose the language Supertext translates into for each language, for example Swiss High German · de-CH for German. Variants of the same language come first. Where HubSpot\'s code is already a Supertext code (de-ch, es, nl), Same as in HubSpot is enough. A language set to Not set isn\'t translated.',
-  'settings.languages.same': 'Same as in HubSpot ({code})',
+    'Choose the language Supertext translates into for each language, for example Swiss High German (de-CH) for German. Variants of the same language come first. Each language starts with its suggestion: the same code where HubSpot\'s code is already a Supertext code (de-ch, es, nl), else the usual variant (German → de-DE, English → en-US, Chinese (China) → zh-Hans, Spanish (Mexico) → es). A language without a suggestion shows — choose — and isn\'t translated until you pick its code.',
   'settings.languages.suggested': 'Suggested',
   'settings.languages.all': 'All Supertext languages',
-  'settings.languages.notMapped': 'Not set',
+  'settings.languages.choose':
+    '— choose —',
   'settings.languages.unmapped':
-    "These languages have no Supertext code yet and aren't translated until you enter one under Languages: {languages}.",
+    'These languages have no Supertext code yet and aren\'t translated until you choose one in the Supertext code column under Languages: {languages}.',
   'settings.languages.sourceUnsupported':
     "Supertext doesn't know {language} as the language of your content. Enter its Supertext code under Languages (for example en-US for English), or let Supertext detect it.",
   'settings.languages.blogHint':
@@ -176,7 +176,7 @@ export const en = {
     "Supertext doesn't translate into this language. Check its Supertext code under Settings → Languages (for example de-CH or es).",
   'error.incomplete': 'Supertext returned an incomplete translation; nothing was saved for this language.',
   'error.unsupportedLanguage':
-    'The language “{code}” has no Supertext code yet, so nothing was sent. Ask your administrator to set it under Settings → Languages (for example de-CH or es).',
+    'The language “{code}” has no Supertext code yet, so nothing was sent. Ask your administrator to choose one in the Supertext code dropdown under Settings → Languages.',
   'error.unsupportedFeature':
     'Supertext offers no formal or informal address for this language. Set the form of address to “Let Supertext decide” under Settings → Translation.',
   'error.hublTags':

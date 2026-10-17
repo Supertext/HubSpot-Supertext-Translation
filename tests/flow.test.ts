@@ -264,15 +264,15 @@ describe('languages', () => {
     await env.connect();
     await env.saveSettings([
       ['sourceLanguage', 'en'],
-      ['target', 'de'],
+      ['target', 'fr-be'],
       ['target', 'it'],
       ['code:it', 'it-ch'],
       ['tone', 'more'],
     ]);
     const settings = await (await env.request('/settings')).text();
     expect(settings).toContain('These languages have no Supertext code yet');
-    const { job } = await env.translate('landing-page', '201', ['de', 'it']);
-    expect(job.items[0]).toMatchObject({ language: 'de', state: 'failed', error: { code: 'unsupportedLanguage', params: { code: 'de' } } });
+    const { job } = await env.translate('landing-page', '201', ['fr-be', 'it']);
+    expect(job.items[0]).toMatchObject({ language: 'fr-be', state: 'failed', error: { code: 'unsupportedLanguage', params: { code: 'fr-be' } } });
     expect(job.items[1]).toMatchObject({ language: 'it', state: 'created' });
     expect(env.supertext.documents.map((d) => [d.target, d.politeness])).toEqual([['it-CH', 'more']]);
     expect(version(env, 'landing-page', '201', 'it')!.htmlTitle).toBe('Calendario dell’Avvento 2026');
@@ -294,9 +294,12 @@ describe('languages', () => {
     const row = (code: string) => html.slice(html.indexOf(`name="code:${code}"`), html.indexOf('</select>', html.indexOf(`name="code:${code}"`)));
     expect(row('de')).toContain('<option value="de-DE" selected');
     expect(row('de').indexOf('gsw-u-sd-chzh')).toBeLessThan(row('de').indexOf('All Supertext languages'));
-    expect(row('de-ch')).toContain('Same as in HubSpot (de-CH)');
-    expect(row('zh-cn')).toContain('Not set');
+    // Nothing saved: the exact match or the SDK's default is preselected, else "— choose —".
+    expect(row('de-ch')).toContain('<option value="de-CH" selected');
+    expect(row('zh-cn')).toContain('<option value="zh-Hans" selected');
+    expect(row('zh-cn')).not.toContain('— choose —');
     expect(row('zh-cn')).toMatch(/Suggested[\s\S]*zh-Hans[\s\S]*zh-Hant[\s\S]*All Supertext/);
+    expect(row('fr-be')).toContain('<option value="" selected="">— choose —');
     expect(html).not.toContain('<datalist');
   });
 });

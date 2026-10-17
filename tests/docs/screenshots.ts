@@ -64,7 +64,7 @@ async function main() {
   await page.click('text=Connect HubSpot');
   await page.waitForURL(`${appUrl}/settings`);
 
-  // Settings: key, languages (Swiss German, French and Italian need no mapping; German gets one), and a connection test.
+  // Settings: key, languages (each dropdown preselects its suggestion; German is set to de-DE explicitly), and a connection test.
   await page.fill('input[name="apiKey"]', 'Supertext-Auth-Key 0123456789abcdef');
   await page.selectOption('select[name="sourceLanguage"]', 'en');
   for (const code of ['de-ch', 'fr-ch', 'it-ch', 'de']) await page.check(`#t-${code}`);
