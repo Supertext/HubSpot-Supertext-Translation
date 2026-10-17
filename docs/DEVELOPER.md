@@ -214,6 +214,7 @@ Once, in Supertext's HubSpot developer account; everything works from a phone's 
 2. GitHub → this repository → Settings → Secrets and variables → Actions: the secret `HUBSPOT_PERSONAL_ACCESS_KEY` and, under *Variables*, `HUBSPOT_ACCOUNT_ID` (the developer account's ID).
 3. Actions → *Upload HubSpot app* → *Run workflow*. It runs `hs project upload` on `hubspot-project/` through HubSpot's own action (pinned); later it runs by itself whenever `hubspot-project/` changes on `main`. Without the variable it is skipped.
 4. HubSpot → Development → Projects → *supertext-translation* → the app → *Auth*: copy the client ID and secret into the Railway variables `HUBSPOT_CLIENT_ID` and `HUBSPOT_CLIENT_SECRET` (the service redeploys).
+5. Once per developer account: the app → **Distribution** tab → **Begin publishing** → *Agree to HubSpot's Acceptable Use Policy* (done 17 October 2026). Without it HubSpot refuses installs in real accounts (*Couldn't complete the connection … has not signed the acceptable use policy*); developer test accounts work either way. Leave the panel's other steps (three installs, Marketplace listing) for later. Until the app is listed it can be installed in up to 25 real accounts (developer test accounts don't count).
 
 With the HubSpot CLI on a computer it is the same as step 3: `npm install -g @hubspot/cli`, `hs account auth`, `cd hubspot-project && hs project upload`. The install URL is the app's `/oauth/start`. An App Marketplace listing (review by HubSpot) comes later.
 
