@@ -29,7 +29,7 @@ src/
   reporting.ts            Commando Center glue (Supertext Plugin Health)
   i18n/                   en, de, fr, it messages; translator; LocalizedError
   views/                  server-rendered pages (hono/jsx): connect, translate, job panel and history, settings
-public/                   app.js (selection, start, polling, test connection), app.css; linked as /static/app.css?v=<content hash> (views/layout.tsx), cached for a year, pages never cached
+public/                   app.js (selection, start, polling, test connection), app.css (Supertext's look, see Look and feel), supertext-logo.svg, favicon.svg, fonts/ (Inter, SIL Open Font License); linked as /static/app.css?v=<content hash> (views/layout.tsx), cached for a year, pages never cached
 hubspot-project/          the HubSpot app definition (developer platform 2026.09): OAuth, scopes, redirect URLs
 scripts/probe.ts          look at a real account (read-only)
 scripts/smoke.sh          the built app against the stand-ins (CI)
@@ -78,6 +78,10 @@ Lists: `limit=25&sort=-updatedAt&archived=false`, cursor `paging.next.after`. La
 ## Interface languages
 
 English, German, French and Italian. HubSpot doesn't pass the user's language to outside pages (only to UI extensions inside HubSpot), so the app follows the browser's `Accept-Language`, unless *Settings → Interface language* chose one: that choice is per browser, not per account (cookie `st_locale`, a year; *Automatic* deletes it), so colleagues sharing an account each keep their own. The connect page offers the four languages as links (`?lang=`, which sets the same cookie). If the browser asks for none of the four, the pages are in English. Strings live in `src/i18n/{en,de,fr,it}.ts`; `en.ts` defines the keys and the others are typed `Messages`, so a missing key fails `npm run typecheck`, and `tests/i18n.test.ts` checks keys, placeholders, URLs, "Supertext" and "HubSpot". **Every new or changed string gets all four languages in the same commit**, formal address (Sie, vous, Lei) and HubSpot's own terms (Website-Seiten, Landingpages, Blogbeiträge, Marketing-E-Mails, Wissensdatenbank; pages de destination, e-mails marketing, base de connaissances; landing page, e-mail di marketing, knowledge base), French narrow no-break space before `? ! : ;`. Language names come from `Intl.DisplayNames`. Errors are `LocalizedError`s (English message for logs, `code` → `error.<code>`).
+
+## Look and feel
+
+The pages follow supertext.com: the deep-green header bar (`#003230`, rounded bottom corners) with Supertext's mint logo (`public/supertext-logo.svg`, the website's own SVG), the warm off-white background (`#f7f5f3`), deep-green text and outlines, mint (`#78ffaf`) for the main action, the active tab and finished translations, light grey lines (`#dfe1df`), and pill-shaped buttons and filters. Text is set in Inter, bundled in `public/fonts/` (variable font, Latin and Latin Extended; SIL Open Font License in `Inter-LICENSE.txt`), so no font is loaded from elsewhere. Supertext's heading font (ABC Ginto Nord) is licensed and not bundled; headings use Inter Bold. The colours are CSS variables at the top of `public/app.css`. The favicon is the logo's S mark on deep green.
 
 ## Supertext API protocol
 

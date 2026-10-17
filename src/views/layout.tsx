@@ -29,6 +29,7 @@ function assetVersion(file: string): string {
 export const ASSETS = {
   css: `/static/app.css?v=${assetVersion('app.css')}`,
   js: `/static/app.js?v=${assetVersion('app.js')}`,
+  logo: `/static/supertext-logo.svg?v=${assetVersion('supertext-logo.svg')}`,
 };
 
 export const LANGUAGE_NAMES: Record<string, string> = { en: 'English', de: 'Deutsch', fr: 'Français', it: 'Italiano' };
@@ -50,14 +51,17 @@ export function Layout(props: { ctx: PageContext; title: string; children: Child
         <meta charset="utf-8" />
         <meta name="viewport" content="width=device-width, initial-scale=1" />
         <title>{props.title}</title>
+        <link rel="preload" href="/static/fonts/inter-latin-wght-normal.woff2" as="font" type="font/woff2" crossorigin="" />
         <link rel="stylesheet" href={ASSETS.css} />
+        <link rel="icon" href="/static/favicon.svg" type="image/svg+xml" />
+        <meta name="theme-color" content="#003230" />
       </head>
       <body data-locale={t.locale} data-csrf={ctx.csrf}>
         <header class="topbar">
-          <div class="brand">
-            <span class="dot" aria-hidden="true"></span>Supertext
+          <a class="brand" href="/" aria-label="Supertext × HubSpot">
+            <img src={ASSETS.logo} alt="Supertext" width="122" height="22" />
             <span class="for">× HubSpot</span>
-          </div>
+          </a>
           {ctx.page !== 'connect' && (
             <nav class="tabs">
               <a href="/" class={ctx.page === 'translate' ? 'tab active' : 'tab'}>
