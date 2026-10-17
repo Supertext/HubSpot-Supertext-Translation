@@ -42,7 +42,7 @@ tests/                    Vitest tests; standin/ (HubSpot and Supertext stand-in
 
 ## How it fits into HubSpot
 
-- **App definition:** `hubspot-project/` is a HubSpot developer project (`hsproject.json`, platform version 2026.09) with one app, `src/app/app-hsmeta.json`: `auth.type: oauth`, the redirect URLs, `requiredScopes` `oauth` + `content`, `optionalScopes` for the knowledge base, distribution `marketplace` (installable from its install URL before it is listed). Upload it with the HubSpot CLI (`hs project upload` in `hubspot-project/`); the client ID and secret are then on the app's *Auth* tab. Replace `REPLACE-WITH-APP_URL` with the Railway URL first. The scopes in the install URL (`HUBSPOT_SCOPES`, `HUBSPOT_OPTIONAL_SCOPES`) must match the file.
+- **App definition:** `hubspot-project/` is a HubSpot developer project (`hsproject.json`, platform version 2026.09) with one app, `src/app/app-hsmeta.json`: `auth.type: oauth`, the redirect URLs (the Railway URL and `http://localhost:8080` for development), `requiredScopes` `oauth` + `content`, `optionalScopes` for the knowledge base, distribution `marketplace` (installable from its install URL before it is listed). The *Upload HubSpot app* workflow uploads it (see *Registering the app in HubSpot*); the client ID and secret are then on the app's *Auth* tab. The scopes in the install URL (`HUBSPOT_SCOPES`, `HUBSPOT_OPTIONAL_SCOPES`) must match the file.
 - **OAuth 2** (authorization code): `/oauth/start` redirects to `https://app.hubspot.com/oauth/authorize` (`client_id`, `redirect_uri=APP_URL/oauth/callback`, `scope`, `optional_scope`, `state`); the callback exchanges the code at `POST https://api.hubapi.com/oauth/2026-09/token` and reads the account from `POST /oauth/2026-09/token/introspect` (`hub_id` = the account's key in the database, `hub_domain` shown in the app, `scopes`: the knowledge base is offered only with `cms.knowledge_base.articles.write`). The user's e-mail address isn't stored. The `state` is a random value in a signed, short-lived cookie.
 - **Tokens:** access tokens live 30 minutes. `TokenManager` refreshes one that is due within a minute before the request (`grant_type=refresh_token`), and `HubSpotClient` forces one refresh after a 401 and repeats the request. Refreshes of the same account share one request. A refused refresh token (`invalid_grant` / `BAD_REFRESH_TOKEN`: the app was uninstalled) clears the tokens; the account has to connect again. Tokens are written only by `Store.saveTokens()`, so a settings save never puts back an older token.
 - **Sessions:** a signed cookie (HMAC-SHA256, 30 days) with the account ID; the tokens stay in the database (encrypted). Form posts and API calls carry a CSRF token derived from the session cookie. Pages refuse framing (`frame-ancestors 'none'`).
@@ -189,14 +189,15 @@ npm run docs:screenshots   # Playwright, 1× scale, into docs/images/
 
 ## Hosting (Railway)
 
-The service **HubSpot** in the Railway project *supertext-cms-demos* (region `ams`) builds this repo's `Dockerfile` (context = repo root; set on the service, Railway ignores `railway.json`). Health check `/health`. Every push to `main` deploys. One instance only: jobs run in the web process.
+The service **HubSpot** in the Railway project *supertext-cms-demos* (region `europe-west4-drams3a`, Amsterdam; https://hubspot-production-ac4d.up.railway.app) builds this repo's `Dockerfile` (context = repo root; set on the service, Railway ignores `railway.json`). Health check `/health`. Every push to `main` deploys. One instance only: jobs run in the web process.
 
 | Variable | Value |
 | --- | --- |
-| `APP_URL` | the service's public URL; `APP_URL/oauth/callback` is in the app's `redirectUrls` |
+| `APP_URL` | `https://${{RAILWAY_PUBLIC_DOMAIN}}`; `APP_URL/oauth/callback` is in the app's `redirectUrls` |
+| `PORT` | `8080` (the domain routes to it) |
 | `HUBSPOT_CLIENT_ID`, `HUBSPOT_CLIENT_SECRET` | from the app's *Auth* tab in HubSpot |
 | `SESSION_SECRET` | random secret for session cookies |
-| `DATABASE_URL` | the shared Postgres service's URL with database `hubspot_supertext` (created on first start) |
+| `DATABASE_URL` | the shared Postgres service with database `hubspot_supertext` (created on first start): `postgresql://${{Postgres.PGUSER}}:${{Postgres.PGPASSWORD}}@${{Postgres.RAILWAY_PRIVATE_DOMAIN}}:5432/hubspot_supertext` |
 | `APP_ENCRYPTION_KEY` | random secret for stored tokens and keys; optional (falls back to the client secret) |
 | `SUPERTEXT_API_KEY` | optional default key (the demo account) |
 | `HUBSPOT_SCOPES`, `HUBSPOT_OPTIONAL_SCOPES` | optional; default `oauth content` and the knowledge base scopes |
@@ -207,7 +208,14 @@ Never commit these values.
 
 ## Registering the app in HubSpot
 
-Once, in Supertext's HubSpot developer account: install the HubSpot CLI (`npm install -g @hubspot/cli`), `hs account auth`, set the Railway URL in `hubspot-project/src/app/app-hsmeta.json` (`redirectUrls`), then `cd hubspot-project && hs project upload`. Copy the client ID and secret from the app's *Auth* tab into the Railway variables. The install URL is the app's `/oauth/start`. An App Marketplace listing (review by HubSpot) comes later.
+Once, in Supertext's HubSpot developer account; everything works from a phone's browser:
+
+1. HubSpot → Development → Keys → *Personal access key*: create one for the developer account (scope *Developer projects*).
+2. GitHub → this repository → Settings → Secrets and variables → Actions: the secret `HUBSPOT_PERSONAL_ACCESS_KEY` and, under *Variables*, `HUBSPOT_ACCOUNT_ID` (the developer account's ID).
+3. Actions → *Upload HubSpot app* → *Run workflow*. It runs `hs project upload` on `hubspot-project/` through HubSpot's own action (pinned); later it runs by itself whenever `hubspot-project/` changes on `main`. Without the variable it is skipped.
+4. HubSpot → Development → Projects → *supertext-translation* → the app → *Auth*: copy the client ID and secret into the Railway variables `HUBSPOT_CLIENT_ID` and `HUBSPOT_CLIENT_SECRET` (the service redeploys).
+
+With the HubSpot CLI on a computer it is the same as step 3: `npm install -g @hubspot/cli`, `hs account auth`, `cd hubspot-project && hs project upload`. The install URL is the app's `/oauth/start`. An App Marketplace listing (review by HubSpot) comes later.
 
 ## Demo
 

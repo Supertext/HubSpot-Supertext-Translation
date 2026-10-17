@@ -4,8 +4,6 @@ Part of Supertext's translation plugins project: Supertext AI translation for th
 
 This repo is a **hosted HubSpot app**: a Node.js/TypeScript service (Hono, server-rendered pages) that users install in HubSpot with OAuth. It makes draft language versions of website pages, landing pages, blog posts (HubSpot language variants), marketing emails (one copy per language) and knowledge base articles (beta API) through HubSpot's content APIs, started on the app's *Translate* page. Hosted on Railway. The HubSpot app definition is `hubspot-project/`. See `docs/DEVELOPER.md`.
 
-> The GitHub repository is still spelled `HupSpot-Supertext-Translation`; code, docs and lists use `HubSpot-Supertext-Translation` (the name after the rename).
-
 ## Documentation rule (always)
 
 Every plugin repo keeps three guides, and **every change that affects behaviour, settings, installation or the code structure updates them in the same commit**:
@@ -49,7 +47,7 @@ Releases are published by `.github/workflows/release.yml`: never tag or create a
 
 ## Checks and alerts (always)
 
-Before starting work in this repo, look at its open findings and fix what the task touches or what is quick: code scanning alerts (`gh api 'repos/Supertext/HupSpot-Supertext-Translation/code-scanning/alerts?state=open'`), secret scanning alerts (`…/secret-scanning/alerts?state=open`), open Dependabot PRs and the issue "Broken links in the docs". New workflows and workflow changes must pass actionlint and zizmor. See `docs/DEVELOPER.md` → *Code quality and security checks*.
+Before starting work in this repo, look at its open findings and fix what the task touches or what is quick: code scanning alerts (`gh api 'repos/Supertext/HubSpot-Supertext-Translation/code-scanning/alerts?state=open'`), secret scanning alerts (`…/secret-scanning/alerts?state=open`), open Dependabot PRs and the issue "Broken links in the docs". New workflows and workflow changes must pass actionlint and zizmor. See `docs/DEVELOPER.md` → *Code quality and security checks*.
 
 ## Demo accounts rule (always)
 
@@ -77,4 +75,5 @@ Lessons from the live API, apply them here: header `Authorization: Supertext-Aut
 - Tokens are written only by `Store.saveTokens`; access tokens are refreshed by `TokenManager`.
 - New settings go in `src/store/store.ts` (`Account`), `src/views/settings.tsx`, the form handler in `src/app.ts` **and** the settings table in `docs/INSTALLATION.md`.
 - Every page and API call needs the session cookie; POSTs also the CSRF token (`src/auth/session.ts`).
-- Hosting: Railway service *HubSpot* in *supertext-cms-demos*, building the `Dockerfile`, health check `/health`, its own database `hubspot_supertext` on the shared Postgres, one instance. Don't export-ignore anything the Dockerfile copies.
+- The app definition (`hubspot-project/`) is uploaded by `.github/workflows/hubspot-app.yml` (by hand or when it changes on `main`); never change scopes or redirect URLs in HubSpot's UI only.
+- Hosting: Railway service *HubSpot* in *supertext-cms-demos* (https://hubspot-production-ac4d.up.railway.app), building the `Dockerfile`, health check `/health`, its own database `hubspot_supertext` on the shared Postgres, one instance. Don't export-ignore anything the Dockerfile copies.

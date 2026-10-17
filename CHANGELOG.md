@@ -14,3 +14,4 @@ First version (in development: tested against a stand-in of the HubSpot APIs, no
 - Recent translations with the result per language and links into HubSpot's editors.
 - Interface in English, German, French and Italian.
 - `npm run hubspot:probe` to look at a real account (read-only).
+- Hosted on Railway at https://hubspot-production-ac4d.up.railway.app; the HubSpot app definition is uploaded by the *Upload HubSpot app* workflow.

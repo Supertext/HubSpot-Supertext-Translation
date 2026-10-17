@@ -1,0 +1,36 @@
+name: Upload HubSpot app
+
+# Uploads the HubSpot app definition (hubspot-project/: OAuth, scopes, redirect URLs) to
+# Supertext's HubSpot developer account with the HubSpot CLI. Runs by hand (Actions →
+# Upload HubSpot app → Run workflow) and when hubspot-project/ changes on main.
+# Needs the repository variable HUBSPOT_ACCOUNT_ID (the developer account's ID) and the
+# secret HUBSPOT_PERSONAL_ACCESS_KEY; without the variable the job is skipped.
+# See docs/DEVELOPER.md → Registering the app in HubSpot.
+on:
+  push:
+    branches: [main]
+    paths: ["hubspot-project/**", ".github/workflows/hubspot-app.yml"]
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: hubspot-app
+  cancel-in-progress: false
+
+jobs:
+  upload:
+    name: Upload to HubSpot
+    if: vars.HUBSPOT_ACCOUNT_ID != ''
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          persist-credentials: false
+      - name: Upload the project
+        uses: HubSpot/hubspot-project-actions/project-upload@373a8c58b82c56f501b8540465d6f1a73efcd2f6 # v1.1.2
+        with:
+          project_dir: hubspot-project
+          account_id: ${{ vars.HUBSPOT_ACCOUNT_ID }}
+          personal_access_key: ${{ secrets.HUBSPOT_PERSONAL_ACCESS_KEY }}

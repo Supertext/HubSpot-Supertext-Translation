@@ -8,7 +8,7 @@
     "auth": {
       "type": "oauth",
       "redirectUrls": [
-        "https://REPLACE-WITH-APP_URL/oauth/callback",
+        "https://hubspot-production-ac4d.up.railway.app/oauth/callback",
         "http://localhost:8080/oauth/callback"
       ],
       "requiredScopes": ["oauth", "content"],
