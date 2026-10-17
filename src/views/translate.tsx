@@ -174,7 +174,7 @@ export function TranslatePage(props: TranslatePageProps) {
       <section id="job-panel" data-job={props.job?.status === 'running' ? props.job.id : undefined}>
         {props.job && <JobPanel t={t} job={props.job} portalId={account.accountId} appBase={props.appBase} />}
       </section>
-      <History t={t} jobs={props.history} />
+      {(props.history.length > 0 || !props.job) && <History t={t} jobs={props.history} />}
     </Layout>
   );
 }

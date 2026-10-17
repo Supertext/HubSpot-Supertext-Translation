@@ -196,7 +196,7 @@ export function createHubSpotStandin(): HubSpotStandin {
         if (kind === 'blog-post') {
           const blog = BLOGS.find((b) => b.id === source.live.contentGroupId);
           if (!blog?.translations.includes(language)) {
-            return error(400, `The blog has no ${language} language variant. Add one under Settings → Content → Blog.`);
+            return error(400, `Blog does not have a variation for language ${language}`); // HubSpot's wording (seen 17 October 2026)
           }
         }
         if ([...entries.values()].some((e) => e.group === source.group && e.live.language === language && !e.archived)) {

@@ -1,4 +1,5 @@
 import { API_VERSION, HubSpotError, KB_API_VERSION, type HubSpotClient } from './client.js';
+import { LocalizedError } from '../i18n/error.js';
 import { Extraction } from './extract.js';
 
 /**
@@ -159,7 +160,15 @@ export async function createVersion(
   }
   const body: Record<string, unknown> = { id: source.id, language };
   if (!str(source.language) && primaryLanguage && kind !== 'blog-post') body.primaryLanguage = primaryLanguage;
-  return client.json<Item>('POST', `${paths[kind]}/multi-language/create-language-variation`, body);
+  try {
+    return await client.json<Item>('POST', `${paths[kind]}/multi-language/create-language-variation`, body);
+  } catch (error) {
+    // HubSpot: "Blog does not have a variation for language fr-ch" (the blog needs that language first).
+    if (error instanceof HubSpotError && error.status === 400 && /does not have a variation for language/i.test(error.detail ?? '')) {
+      throw new LocalizedError(`The blog has no ${language} version in HubSpot yet.`, 'blogLanguageMissing', { language });
+    }
+    throw error;
+  }
 }
 
 /** A new knowledge base article in another language, linked to the primary (made with its content at once). */

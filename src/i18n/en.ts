@@ -188,6 +188,7 @@ export const en = {
   'error.hubspotNotFound': 'Not found in HubSpot.',
   'error.hubspotRateLimited': 'Too many requests to HubSpot. Please try again shortly.',
   'error.hubspotUnavailable': 'HubSpot is currently unavailable. Please try again shortly.',
+  'error.blogLanguageMissing': "The blog has no “{language}” version in HubSpot yet, so nothing was translated for this language. Add a language variation of the blog in HubSpot (Settings → Content → Blog), then translate again.",
   'error.hubspotHttp': 'HubSpot answered with HTTP {status}.',
   'error.hubspotUnreachable': 'Could not reach HubSpot: {reason}',
   'error.itemMissing': 'The item no longer exists in HubSpot.',

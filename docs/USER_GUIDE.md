@@ -74,7 +74,7 @@ The result shows the reason for each language that fails; the other languages st
 | *Supertext offers no formal or informal address for this language* | An administrator sets the form of address to *Let Supertext decide* under Settings → Translation. |
 | *Supertext doesn't translate into …* | An administrator checks the language's Supertext code under Settings → Languages. |
 | *Supertext returned 2 of 3 personalization tokens or HubL tags; nothing was saved for this language.* | A token got lost in the translation, so nothing was saved (a lost `{{ contact.firstname }}` would show to readers). Translate that language again. |
-| *The blog has no … language variant* | An administrator adds the blog's language variant in HubSpot. |
+| *The blog has no “fr-ch” version in HubSpot yet …* | The blog needs that language first: an administrator adds a language variation of the blog in HubSpot (Settings → Content → Blog). Nothing was translated or paid for that language; translate again afterwards. |
 | *This is a language version of another item* | Translate the original (primary) instead. |
 | *The item has no language in HubSpot …* | Set the page's language in HubSpot, or ask your administrator to set the language of your content. |
 | *HubSpot refused the request …* | Your HubSpot subscription may not include this; tell your administrator. |

@@ -154,8 +154,10 @@ describe('blog posts', () => {
     const { job, html } = await env.translate('blog-post', '301', ['de-ch', 'fr-ch', 'it-ch']);
     expect(job.status).toBe('done');
     expect(html).toContain('2 created, 0 updated, 0 kept, 1 failed');
-    expect(job.items[2]).toMatchObject({ language: 'it-ch', state: 'failed', error: { code: 'hubspotHttp' } });
-    expect(html).toContain('The blog has no it-ch language variant');
+    expect(job.items[2]).toMatchObject({ language: 'it-ch', state: 'failed', error: { code: 'blogLanguageMissing', params: { language: 'it-ch' } } });
+    expect(html).toContain('The blog has no “it-ch” version in HubSpot yet, so nothing was translated for this language.');
+    // HubSpot refused the version before anything was sent to Supertext.
+    expect(env.supertext.documents.map((d) => d.target)).toEqual(['de-CH', 'fr-CH']);
     const german = version(env, 'blog-post', '301', 'de-ch')!;
     expect(german.name).toBe('Wie wir unsere Kakaobohnen rösten');
     expect(german.postBody).toBe(
@@ -394,6 +396,7 @@ describe('Commando Center', () => {
     const { job } = await env.translate('site-page', '101', ['de-ch', 'fr-ch']);
     expect(job).toMatchObject({ status: 'failed', error: { code: 'auth' } });
     expect(job.items.length).toBe(1);
-    expect(version(env, 'site-page', '101', 'de-ch')).toBeUndefined();
+    // The version made before translating was removed again (archived, as HubSpot does).
+    expect(version(env, 'site-page', '101', 'de-ch')?.archived).toBe(true);
   });
 });

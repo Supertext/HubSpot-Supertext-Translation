@@ -12,8 +12,8 @@ import type { Politeness, SupertextClient } from '../supertext/client.js';
 import type { JobItem } from '../store/store.js';
 
 /**
- * One item × one language: translate its texts in one Supertext request, then
- * write them to the language version's draft — a version made for the purpose
+ * One item × one language: make the language version (unless it exists), translate its texts in
+ * one Supertext request, then write them to the version's draft — a version made for the purpose
  * (HubSpot's language variant, an email clone, an article translation), or the
  * existing one when it is to be updated. Nothing is published.
  */
@@ -46,30 +46,36 @@ export type TranslateResult = Pick<JobItem, 'state' | 'targetId'>;
 export async function translateItem(args: TranslateArgs): Promise<TranslateResult> {
   const { client, kind, source, existingId } = args;
   if (existingId && !args.overwrite) return { state: 'kept', targetId: existingId };
-
-  // Everything is translated and checked (HubL tokens) before anything is written to HubSpot.
   const { extraction, fields } = extractItem(kind, args.draft);
-  const segments = extraction.segments;
-  const translated =
-    segments.length === 0
-      ? []
-      : await args.supertext.translateSegments(
-          segments.map((segment) => segment.html),
-          { targetLanguage: args.supertextTarget, sourceLanguage: args.sourceLanguage, politeness: args.politeness },
-        );
-  extraction.apply(translated);
-  const values = fields();
+
+  /** Translates and checks every segment (HubL tokens) before anything is written; returns the fields to write. */
+  const translate = async (): Promise<Record<string, unknown>> => {
+    const segments = extraction.segments;
+    const translated =
+      segments.length === 0
+        ? []
+        : await args.supertext.translateSegments(
+            segments.map((segment) => segment.html),
+            { targetLanguage: args.supertextTarget, sourceLanguage: args.sourceLanguage, politeness: args.politeness },
+          );
+    extraction.apply(translated);
+    return fields();
+  };
 
   if (existingId) {
-    await updateDraft(client, kind, existingId, values);
+    await updateDraft(client, kind, existingId, await translate());
     return { state: 'updated', targetId: existingId };
   }
   if (kind === 'kb-article') {
-    const created = await createArticleTranslation(client, source, args.language, values);
+    // An article is created with its content in one call.
+    const created = await createArticleTranslation(client, source, args.language, await translate());
     return { state: 'created', targetId: String(created.id) };
   }
+  // The language version first: if HubSpot refuses it (a blog without that language, an existing
+  // variant), nothing is sent to Supertext and nothing is paid for.
   const created = await createVersion(client, kind, source, args.language, args.primaryLanguage);
   try {
+    const values = await translate();
     if (Object.keys(values).length > 0) await updateDraft(client, kind, String(created.id), values);
   } catch (error) {
     // Don't leave an untranslated copy behind.

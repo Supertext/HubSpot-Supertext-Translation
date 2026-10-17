@@ -179,6 +179,7 @@ export const it: Messages = {
   'error.hubspotNotFound': 'Non trovato in HubSpot.',
   'error.hubspotRateLimited': 'Troppe richieste a HubSpot. Riprovi tra poco.',
   'error.hubspotUnavailable': 'HubSpot al momento non è disponibile. Riprovi tra poco.',
+  'error.blogLanguageMissing': "Il blog non ha ancora una versione «{language}» in HubSpot, quindi per questa lingua non è stato tradotto nulla. Aggiunga una variante linguistica del blog in HubSpot (Impostazioni → Contenuti → Blog), poi traduca di nuovo.",
   'error.hubspotHttp': 'HubSpot ha risposto con HTTP {status}.',
   'error.hubspotUnreachable': 'Impossibile raggiungere HubSpot: {reason}',
   'error.itemMissing': 'Il contenuto non esiste più in HubSpot.',
