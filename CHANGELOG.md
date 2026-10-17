@@ -4,7 +4,7 @@ All notable changes to Supertext Translation for HubSpot.
 
 ## Unreleased
 
-First version (in development: tested against a stand-in of the HubSpot APIs, not yet on a real account).
+First version, tested on a real HubSpot account (17 October 2026: installing with OAuth, token refresh, blog posts into language variants and updating their drafts) and against a stand-in of the HubSpot APIs; pages, emails and the knowledge base still to be tried on a real account.
 
 - Hosted app installed in HubSpot with OAuth (`content` scope; the knowledge base scopes when the account has them). The HubSpot app definition is in `hubspot-project/` (developer platform 2026.09).
 - Translates website pages, landing pages, blog posts, marketing emails and knowledge base articles with Supertext AI on the app's *Translate* page. Pages and posts become HubSpot language variants in the original's multi-language group, emails get one copy per language, articles a linked translation; everything as a draft, nothing published or sent.

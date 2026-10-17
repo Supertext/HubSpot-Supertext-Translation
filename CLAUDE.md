@@ -35,7 +35,7 @@ The settings page shows the version from `package.json` (read at runtime by `src
 
 ## Plugin list (always)
 
-`README.md` ends with the shared list of all Supertext plugins (between the `<!-- supertext-plugins:start -->` and `<!-- supertext-plugins:end -->` markers). It is identical in every Supertext plugin repo: when a plugin is added, renamed or its description changes, update the list in **all** repos and on the org profile, not just this one. HubSpot is listed under *CMS* as *In development* until it has been tested on a real HubSpot account.
+`README.md` ends with the shared list of all Supertext plugins (between the `<!-- supertext-plugins:start -->` and `<!-- supertext-plugins:end -->` markers). It is identical in every Supertext plugin repo: when a plugin is added, renamed or its description changes, update the list in **all** repos and on the org profile, not just this one. HubSpot is listed under *CMS* without *In development*: it was tested on a real HubSpot account on 17 October 2026.
 
 ## Releases (always)
 

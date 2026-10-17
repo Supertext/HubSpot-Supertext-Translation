@@ -2,7 +2,7 @@
 
 For HubSpot super admins and administrators setting up Supertext Translation.
 
-> **Status: in development.** The app is tested against a stand-in of the HubSpot APIs. It isn't in the HubSpot App Marketplace yet and hasn't been tried on a real account. Ask Supertext before using it on a live website.
+> **Status: tested on a real HubSpot account** (installing, blog posts). It isn't in the HubSpot App Marketplace yet, and website pages, landing pages, emails and the knowledge base haven't been tried on a real account yet. Ask Supertext before using it on a live website.
 
 ## How it works
 

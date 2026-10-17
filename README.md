@@ -2,7 +2,7 @@
 
 Translate your HubSpot content with [Supertext](https://www.supertext.com) AI: website pages, landing pages, blog posts, marketing emails and knowledge base articles. Each language becomes its own version in HubSpot, saved as a draft for you to review and publish. Pages and blog posts become HubSpot language variants of the original (one multi-language group); emails get one copy per language; articles a linked translation.
 
-> **Status: in development.** The app works against a stand-in of the HubSpot APIs (tests, screenshots). Testing on a real HubSpot account is the next step; see [Known limitations](docs/DEVELOPER.md#known-limitations--roadmap).
+> **Status: tested on a real HubSpot account** (17 October 2026: installing with OAuth, blog posts into language variants). Not yet in the HubSpot App Marketplace. What has been confirmed on a real account and what is still to check (pages, emails, knowledge base) is in [Known limitations](docs/DEVELOPER.md#known-limitations--roadmap).
 
 ![Translate with Supertext: the website page About us selected, Swiss French and Swiss High German ticked](docs/images/translate-page.png)
 
