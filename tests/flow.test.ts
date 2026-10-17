@@ -285,6 +285,30 @@ describe('languages', () => {
   });
 });
 
+describe('interface language', () => {
+  it('follows the browser, and Settings can choose another one for this browser only', async () => {
+    const env = setup();
+    await env.connect();
+    const english = await (await env.request('/settings')).text();
+    expect(english).toContain('Automatic (your browser’s language)');
+    expect(english).not.toContain('class="langs"'); // no switcher in the header any more
+    await env.saveSettings([...STANDARD_SETTINGS, ['uiLanguage', 'de']]);
+    const german = await (await env.request('/settings')).text();
+    expect(german).toContain('Supertext-Einstellungen');
+    expect(german).toMatch(/<option value="de" lang="de" selected/);
+    expect(await (await env.request('/')).text()).toContain('Mit Supertext übersetzen');
+    await env.saveSettings([...STANDARD_SETTINGS, ['uiLanguage', 'auto']]);
+    expect(await (await env.request('/settings')).text()).toContain('Supertext settings');
+  });
+
+  it('offers the four languages as links on the connect page', async () => {
+    const env = setup();
+    const page = await (await env.request('/')).text();
+    expect(page).toContain('href="/?lang=fr"');
+    expect(await (await env.request('/?lang=fr')).text()).toContain('Connecter HubSpot');
+  });
+});
+
 describe('HubSpot tokens', () => {
   it('refreshes an expired access token and goes on', async () => {
     const env = setup();

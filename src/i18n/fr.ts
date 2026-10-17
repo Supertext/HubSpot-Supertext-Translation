@@ -122,6 +122,10 @@ export const fr: Messages = {
     'Supertext ne propose pas de forme d’adresse formelle ou informelle pour {languages} ; ces langues sont traduites avec le réglage par défaut de Supertext.',
   'settings.keyCheck.label': 'Vérification de la clé API :',
   'settings.keyCheck.at': '(dernière vérification {time} UTC)',
+  'settings.ui.heading': "Langue de l’interface",
+  'settings.ui.label': "Langue de ces pages",
+  'settings.ui.auto': "Automatique (langue de votre navigateur)",
+  'settings.ui.help': "S’applique uniquement à ce navigateur : chaque collègue peut choisir la sienne. Elle n’a aucune influence sur les langues dans lesquelles vos contenus sont traduits.",
   'settings.reports.heading': 'Support Supertext',
   'settings.reports.label': 'Envoyer les informations de version à Supertext',
   'settings.reports.help':

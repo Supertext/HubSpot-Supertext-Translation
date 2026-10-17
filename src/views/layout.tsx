@@ -31,7 +31,7 @@ export const ASSETS = {
   js: `/static/app.js?v=${assetVersion('app.js')}`,
 };
 
-const LANGUAGE_NAMES: Record<string, string> = { en: 'English', de: 'Deutsch', fr: 'Français', it: 'Italiano' };
+export const LANGUAGE_NAMES: Record<string, string> = { en: 'English', de: 'Deutsch', fr: 'Français', it: 'Italiano' };
 
 /** A link within the app. */
 export function appUrl(path: string, params: Record<string, string | number | undefined> = {}): string {
@@ -44,7 +44,6 @@ export function appUrl(path: string, params: Record<string, string | number | un
 export function Layout(props: { ctx: PageContext; title: string; children: Child }) {
   const { ctx } = props;
   const { t } = ctx;
-  const here = ctx.page === 'settings' ? '/settings' : '/';
   return (
     <html lang={t.locale}>
       <head>
@@ -71,18 +70,24 @@ export function Layout(props: { ctx: PageContext; title: string; children: Child
           )}
           <span class="spacer"></span>
           {ctx.accountName && <span class="account">{ctx.accountName}</span>}
-          <nav class="langs" aria-label={t.t('nav.language')}>
-            {LOCALES.map((locale) => (
-              <a href={appUrl(here, { lang: locale })} class={locale === t.locale ? 'active' : ''} lang={locale} title={LANGUAGE_NAMES[locale]}>
-                {locale.toUpperCase()}
-              </a>
-            ))}
-          </nav>
         </header>
         <main class="page">{props.children}</main>
         <script src={ASSETS.js} defer></script>
       </body>
     </html>
+  );
+}
+
+/** The four interface languages as links (the connect page, before there are settings). */
+export function LanguageLinks(props: { t: Translator; path: string }) {
+  return (
+    <nav class="langs" aria-label={props.t.t('nav.language')}>
+      {LOCALES.map((locale) => (
+        <a href={appUrl(props.path, { lang: locale })} class={locale === props.t.locale ? 'active' : ''} lang={locale}>
+          {LANGUAGE_NAMES[locale]}
+        </a>
+      ))}
+    </nav>
   );
 }
 

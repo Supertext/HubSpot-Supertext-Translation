@@ -13,7 +13,8 @@ import {
   supportsPoliteness,
 } from '../translation/languages.js';
 import { releaseUrl, VERSION } from '../version.js';
-import { API_KEY_URL, ApiKeyHelp, Layout, Notice, SIGNUP_URL, splitTemplate, type PageContext } from './layout.js';
+import { API_KEY_URL, ApiKeyHelp, LANGUAGE_NAMES, Layout, Notice, SIGNUP_URL, splitTemplate, type PageContext } from './layout.js';
+import { LOCALES } from '../i18n/index.js';
 
 /** The key check result in the interface language (the Commando Center's wording). */
 export function keyCheckText(t: Translator, check: ApiKeyCheck): string {
@@ -65,6 +66,8 @@ export interface SettingsPageProps {
   invalidCodes?: string;
   /** The account granted the knowledge base scopes. */
   knowledgeBase: boolean;
+  /** This browser's interface language: chosen in the settings, or 'auto' (the browser's). */
+  uiLanguage: 'auto' | (typeof LOCALES)[number];
 }
 
 export function SettingsPage(props: SettingsPageProps) {
@@ -223,6 +226,24 @@ export function SettingsPage(props: SettingsPageProps) {
           {account.tone !== 'default' && noPoliteness.length > 0 && (
             <p class="help">{t.t('settings.style.notOffered', { languages: names(noPoliteness) })}</p>
           )}
+        </section>
+
+        <section class="card">
+          <h2>{t.t('settings.ui.heading')}</h2>
+          <label class="field">
+            <span>{t.t('settings.ui.label')}</span>
+            <select name="uiLanguage">
+              <option value="auto" selected={props.uiLanguage === 'auto'}>
+                {t.t('settings.ui.auto')}
+              </option>
+              {LOCALES.map((locale) => (
+                <option value={locale} lang={locale} selected={props.uiLanguage === locale}>
+                  {LANGUAGE_NAMES[locale]}
+                </option>
+              ))}
+            </select>
+          </label>
+          <p class="help">{t.t('settings.ui.help')}</p>
         </section>
 
         <section class="card">

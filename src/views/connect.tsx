@@ -1,5 +1,5 @@
 import type { ErrorInfo } from '../i18n/error.js';
-import { Layout, Notice, type PageContext } from './layout.js';
+import { LanguageLinks, Layout, Notice, type PageContext } from './layout.js';
 
 /** The start page without a session: what the app does and "Connect HubSpot". */
 export function ConnectPage(props: { ctx: PageContext; error?: ErrorInfo; notice?: 'denied' | 'disconnected'; configured: boolean }) {
@@ -26,6 +26,7 @@ export function ConnectPage(props: { ctx: PageContext; error?: ErrorInfo; notice
           </a>
         </div>
         <p class="help">{t.t('connect.hint')}</p>
+        <LanguageLinks t={t} path="/" />
       </section>
     </Layout>
   );

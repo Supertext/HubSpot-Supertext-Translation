@@ -122,6 +122,10 @@ export const it: Messages = {
     'Supertext non offre una forma di cortesia formale o informale per {languages}; queste lingue vengono tradotte con l’impostazione predefinita di Supertext.',
   'settings.keyCheck.label': 'Verifica della chiave API:',
   'settings.keyCheck.at': '(ultima verifica {time} UTC)',
+  'settings.ui.heading': "Lingua dell’interfaccia",
+  'settings.ui.label': "Lingua di queste pagine",
+  'settings.ui.auto': "Automatica (lingua del Suo browser)",
+  'settings.ui.help': "Vale solo per questo browser, così ogni collega può scegliere la propria. Non influisce sulle lingue in cui vengono tradotti i Suoi contenuti.",
   'settings.reports.heading': 'Assistenza Supertext',
   'settings.reports.label': 'Inviare le informazioni sulla versione a Supertext',
   'settings.reports.help':

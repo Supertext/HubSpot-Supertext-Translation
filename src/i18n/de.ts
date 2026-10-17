@@ -125,6 +125,10 @@ export const de: Messages = {
     'Supertext bietet für {languages} keine formelle oder informelle Anrede an; diese Sprachen werden mit der Vorgabe von Supertext übersetzt.',
   'settings.keyCheck.label': 'Prüfung des API-Schlüssels:',
   'settings.keyCheck.at': '(zuletzt geprüft {time} UTC)',
+  'settings.ui.heading': "Sprache der Oberfläche",
+  'settings.ui.label': "Sprache dieser Seiten",
+  'settings.ui.auto': "Automatisch (Sprache Ihres Browsers)",
+  'settings.ui.help': "Gilt nur für diesen Browser, so kann jede Kollegin und jeder Kollege die eigene wählen. Sie hat keinen Einfluss darauf, in welche Sprachen Ihre Inhalte übersetzt werden.",
   'settings.reports.heading': 'Supertext-Support',
   'settings.reports.label': 'Versionsinformationen an Supertext senden',
   'settings.reports.help':

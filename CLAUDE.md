@@ -27,7 +27,7 @@ Wording: "No Supertext account yet? Create one at supertext.com. Generate your A
 
 ## UI languages (always)
 
-The app's pages are in English, German, French and Italian. HubSpot doesn't pass a language, so the app follows its own top-bar switch (`?lang=`, cookie `st_locale`), then `Accept-Language`. Strings live in `src/i18n/{en,de,fr,it}.ts` (typed: a missing key fails `npm run typecheck`; `tests/i18n.test.ts` checks placeholders, URLs, "Supertext" and "HubSpot"). **New or changed strings get all four languages in the same commit.** Formal address (Sie, vous, Lei), HubSpot's own terms in each language, "Supertext", placeholders and URLs never translated. Errors shown in the UI are `LocalizedError`s with a `code` (`error.<code>`).
+The app's pages are in English, German, French and Italian. HubSpot doesn't pass a language, so the app follows the browser's `Accept-Language`, unless *Settings → Interface language* chose one for that browser (cookie `st_locale`; the connect page has the same choice as links, `?lang=`). HubSpot only tells UI extensions inside HubSpot the user's language, not outside pages. Strings live in `src/i18n/{en,de,fr,it}.ts` (typed: a missing key fails `npm run typecheck`; `tests/i18n.test.ts` checks placeholders, URLs, "Supertext" and "HubSpot"). **New or changed strings get all four languages in the same commit.** Formal address (Sie, vous, Lei), HubSpot's own terms in each language, "Supertext", placeholders and URLs never translated. Errors shown in the UI are `LocalizedError`s with a `code` (`error.<code>`).
 
 ## Plugin version on the settings screen (always)
 

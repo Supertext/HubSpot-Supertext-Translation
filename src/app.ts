@@ -337,6 +337,10 @@ export function createApp(deps: AppDeps) {
           saved: c.req.query('saved') === '1',
           invalidCodes: c.req.query('invalid') || undefined,
           knowledgeBase: knowledgeBase(session.account),
+          uiLanguage: (() => {
+            const chosen = getCookie(c, 'st_locale') ?? '';
+            return /^(en|de|fr|it)$/.test(chosen) ? (chosen as 'en' | 'de' | 'fr' | 'it') : 'auto';
+          })(),
         }),
       ),
     );
@@ -375,6 +379,14 @@ export function createApp(deps: AppDeps) {
     }
     account.languageCodes = codes;
     if (!reporting.fixedByEnvironment) account.versionReports = field('versionReports') === '1';
+
+    // The interface language belongs to this browser (each colleague picks their own), not to the account.
+    const uiLanguage = field('uiLanguage');
+    if (/^(en|de|fr|it)$/.test(uiLanguage)) {
+      setCookie(c, 'st_locale', uiLanguage, { path: '/', maxAge: 365 * 86400, sameSite: 'Lax', secure });
+    } else if (uiLanguage === 'auto') {
+      deleteCookie(c, 'st_locale', { path: '/' });
+    }
 
     await store.saveAccount(account);
     // The automatic API key check (shown on the settings page) and the settings_saved report.

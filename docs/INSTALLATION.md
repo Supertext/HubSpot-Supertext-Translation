@@ -34,9 +34,9 @@ The app's settings page links to both, next to the API key field.
 
 ## 2. Install the app in HubSpot
 
-Open the app (Supertext sends you its address until it is listed in the HubSpot App Marketplace) and click **Connect HubSpot**. HubSpot asks you to choose the account and to allow *Supertext Translation* to access your content; confirm. If your account has the knowledge base, HubSpot also offers access to it. You come back to the app's settings.
+Open the app (Supertext sends you its address until it is listed in the HubSpot App Marketplace) and click **Connect HubSpot**. The page is in your browser's language; the links at the bottom switch to English, German, French or Italian. HubSpot asks you to choose the account and to allow *Supertext Translation* to access your content; confirm. If your account has the knowledge base, HubSpot also offers access to it. You come back to the app's settings.
 
-<img src="images/connect.png" alt="Supertext Translation for HubSpot: what the app does in three points and the button Connect HubSpot" width="640">
+<img src="images/connect.png" alt="Supertext Translation for HubSpot: what the app does in three points, the button Connect HubSpot and the interface languages English, Deutsch, Français and Italiano" width="640">
 
 The app asks HubSpot for:
 
@@ -51,7 +51,7 @@ Everyone in your team who connects the same HubSpot account shares its settings.
 
 Enter the API key, choose your languages and click **Save**. Saving checks the API key automatically (free of charge, nothing is translated) and shows the result under the key: *API key checked: the connection to Supertext works.* means everything is in place. **Test connection** runs the same check again, also for a key you have typed but not saved yet.
 
-<img src="images/settings.png" alt="Supertext settings: the saved API key with links to create a Supertext account and generate the key, the API key check result and Test connection, both saying the connection to Supertext works; the language of the content (English); German with the Supertext code de-DE, Italian (Switzerland), Swiss French and Swiss High German ticked, sent as it-CH, fr-CH and de-CH; the form of address; Send version information to Supertext; the connected account swiss-chocolate.example with the knowledge base connected; and the version 0.1.0" width="720">
+<img src="images/settings.png" alt="Supertext settings: the saved API key with links to create a Supertext account and generate the key, the API key check result and Test connection, both saying the connection to Supertext works; the language of the content (English); German with the Supertext code de-DE, Italian (Switzerland), Swiss French and Swiss High German ticked, sent as it-CH, fr-CH and de-CH; the form of address; Send version information to Supertext; the interface language (automatic); the connected account swiss-chocolate.example with the knowledge base connected; and the version 0.1.0" width="720">
 
 | Setting | Default | Purpose |
 | --- | --- | --- |
@@ -62,6 +62,7 @@ Enter the API key, choose your languages and click **Save**. Saving checks the A
 | Supertext code | empty | The language mapping: the code Supertext uses for this HubSpot language, picked from Supertext's list (the field suggests them). German, English, French, Italian and Portuguese need a region (`de-CH`, `de-DE`, `de-AT`, `en-US`, `en-GB`, `fr-CH`, `fr-FR`, `it-CH`, `it-IT`, `pt-BR`, `pt-PT`), Chinese and Serbian a script (`zh-Hans`, `zh-Hant`, `sr-Latn`, `sr-Cyrl`), Norwegian is `nb`; the others are the bare language (`es`, `nl`, `sl` …). Empty: the HubSpot code is used only if it is a Supertext code as it is (`de-ch` → `de-CH`, `es`, `nl`); otherwise the language isn't translated (*has no Supertext code yet*). Nothing is guessed: bare `de`, `fr` or `zh-cn` need a code. The column *Sent to Supertext* shows what each language is sent as, or *Not set*, and the page warns about ticked languages without a code. A code Supertext doesn't offer isn't saved (*Saved, except these codes …*). The same mapping gives the source language (`en-us` is sent as the source `en`). |
 | Form of address | Let Supertext decide | *Formal* (German "Sie", French "vous") or *Informal* ("du", "tu"). Sent only for languages where Supertext offers it; the page names the ticked languages that don't have it, which are translated with Supertext's default. |
 | Send version information to Supertext | On | See *Version information* below. |
+| Interface language | Automatic | The language of the app's own pages: your browser's language, or English, Deutsch, Français or Italiano. Saved for this browser only, so each colleague can choose their own; it doesn't change which languages your content is translated into. |
 
 The settings page also shows whether the knowledge base is connected and the app's version, linked to its release notes.
 
