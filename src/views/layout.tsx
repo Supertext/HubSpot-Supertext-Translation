@@ -1,3 +1,5 @@
+import { createHash } from 'node:crypto';
+import { readFileSync } from 'node:fs';
 import type { Child } from 'hono/jsx';
 import { LOCALES, type Translator } from '../i18n/index.js';
 
@@ -12,6 +14,22 @@ export interface PageContext {
 
 export const SIGNUP_URL = 'https://www.supertext.com/person/en/account/signin';
 export const API_KEY_URL = 'https://www.supertext.com/en/integrations/api';
+
+/**
+ * The static files' addresses carry a hash of their content (`/static/app.css?v=…`), so a
+ * browser fetches the new file right after a deploy instead of a cached old one.
+ */
+function assetVersion(file: string): string {
+  try {
+    return createHash('sha256').update(readFileSync(new URL(`../../public/${file}`, import.meta.url))).digest('hex').slice(0, 12);
+  } catch {
+    return 'dev';
+  }
+}
+export const ASSETS = {
+  css: `/static/app.css?v=${assetVersion('app.css')}`,
+  js: `/static/app.js?v=${assetVersion('app.js')}`,
+};
 
 const LANGUAGE_NAMES: Record<string, string> = { en: 'English', de: 'Deutsch', fr: 'Français', it: 'Italiano' };
 
@@ -33,7 +51,7 @@ export function Layout(props: { ctx: PageContext; title: string; children: Child
         <meta charset="utf-8" />
         <meta name="viewport" content="width=device-width, initial-scale=1" />
         <title>{props.title}</title>
-        <link rel="stylesheet" href="/static/app.css" />
+        <link rel="stylesheet" href={ASSETS.css} />
       </head>
       <body data-locale={t.locale} data-csrf={ctx.csrf}>
         <header class="topbar">
@@ -62,7 +80,7 @@ export function Layout(props: { ctx: PageContext; title: string; children: Child
           </nav>
         </header>
         <main class="page">{props.children}</main>
-        <script src="/static/app.js" defer></script>
+        <script src={ASSETS.js} defer></script>
       </body>
     </html>
   );

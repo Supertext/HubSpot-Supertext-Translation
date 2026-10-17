@@ -32,6 +32,11 @@ async function main() {
 
   const app = createApp({ config, store });
   const root = new URL('../public/', import.meta.url).pathname;
+  // Versioned addresses (?v=<content hash>, see views/layout.tsx) can be cached for good; others are revalidated.
+  app.use('/static/*', async (c, next) => {
+    await next();
+    c.header('Cache-Control', c.req.query('v') ? 'public, max-age=31536000, immutable' : 'no-cache');
+  });
   app.use('/static/*', serveStatic({ root, rewriteRequestPath: (path) => path.replace(/^\/static/, '') }));
 
   serve({ fetch: app.fetch, port: config.port }, (info) => {

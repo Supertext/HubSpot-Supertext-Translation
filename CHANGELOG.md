@@ -12,6 +12,6 @@ First version (in development: tested against a stand-in of the HubSpot APIs, no
 - Existing language versions are kept unless *Update existing versions* is ticked (with a warning); a sent email copy is never changed.
 - Settings per HubSpot account: Supertext API key (stored encrypted, with account and API key links) with the automatic key check and *Test connection*, the content language, target languages with their Supertext codes (no guessed regions), form of address, *Send version information to Supertext* (Commando Center through Supertext Plugin Health 0.1.0; Supertext SDK 0.3.0), disconnecting, and the app version linked to its release.
 - Recent translations with the result per language and links into HubSpot's editors.
-- Interface in English, German, French and Italian, also on phones (the pages fit the screen; wide tables scroll inside their card; Save stays at the bottom of the settings).
+- Interface in English, German, French and Italian, also on phones (the pages fit the screen; wide tables scroll inside their card; Save stays at the bottom of the settings). The stylesheet and script addresses change with every release, so browsers, Safari on iPhone included, load the new layout right away instead of a cached one.
 - `npm run hubspot:probe` to look at a real account (read-only).
 - Hosted on Railway at https://hubspot-production-ac4d.up.railway.app; the HubSpot app definition is uploaded by the *Upload HubSpot app* workflow.

@@ -87,6 +87,8 @@ export function createApp(deps: AppDeps) {
     c.header('Content-Security-Policy', "frame-ancestors 'none'");
     c.header('Referrer-Policy', 'strict-origin-when-cross-origin');
     c.header('X-Content-Type-Options', 'nosniff');
+    // Pages show the account's live state: never from a cache (static files set their own, see server.ts).
+    if (!c.req.path.startsWith('/static/')) c.header('Cache-Control', 'no-cache, private');
   });
 
   // ?lang=de switches the interface language and remembers it.

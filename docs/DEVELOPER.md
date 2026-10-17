@@ -29,7 +29,7 @@ src/
   reporting.ts            Commando Center glue (Supertext Plugin Health)
   i18n/                   en, de, fr, it messages; translator; LocalizedError
   views/                  server-rendered pages (hono/jsx): connect, translate, job panel and history, settings
-public/                   app.js (selection, start, polling, test connection), app.css
+public/                   app.js (selection, start, polling, test connection), app.css; linked as /static/app.css?v=<content hash> (views/layout.tsx), cached for a year, pages never cached
 hubspot-project/          the HubSpot app definition (developer platform 2026.09): OAuth, scopes, redirect URLs
 scripts/probe.ts          look at a real account (read-only)
 scripts/smoke.sh          the built app against the stand-ins (CI)
