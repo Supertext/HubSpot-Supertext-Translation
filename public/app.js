@@ -82,6 +82,60 @@
       });
     });
     updateButton();
+
+    // Export for translation: the file comes back as a download (no API key needed).
+    var exportButton = document.getElementById('export-button');
+    var exportMessage = document.getElementById('export-message');
+    if (exportButton) {
+      exportButton.addEventListener('click', function () {
+        var item = checked(form, 'item')[0];
+        var languages = checked(form, 'language');
+        var format = checked(form, 'format')[0] || 'xliff';
+        if (!item || languages.length === 0) {
+          exportMessage.textContent = exportButton.getAttribute('data-select');
+          return;
+        }
+        if (format === 'html' && languages.length !== 1) {
+          exportMessage.textContent = exportButton.getAttribute('data-one');
+          return;
+        }
+        exportMessage.textContent = '';
+        exportButton.disabled = true;
+        fetch('/api/export', {
+          method: 'POST',
+          credentials: 'same-origin',
+          headers: { 'Content-Type': 'application/json', 'X-CSRF-Token': csrf, 'Accept-Language': locale },
+          body: JSON.stringify({ kind: form.getAttribute('data-kind'), itemId: item, languages: languages, format: format }),
+        })
+          .then(function (response) {
+            if (!response.ok) {
+              return response.json().then(function (json) {
+                exportMessage.textContent = (json.error && json.error.message) || 'Error';
+              });
+            }
+            var disposition = response.headers.get('Content-Disposition') || '';
+            var match = /filename="([^"]+)"/.exec(disposition);
+            return response.blob().then(function (blob) {
+              var url = URL.createObjectURL(blob);
+              var link = document.createElement('a');
+              link.href = url;
+              link.download = match ? match[1] : 'supertext.xlf';
+              document.body.appendChild(link);
+              link.click();
+              link.remove();
+              setTimeout(function () {
+                URL.revokeObjectURL(url);
+              }, 10000);
+            });
+          })
+          .catch(function () {
+            exportMessage.textContent = 'Error';
+          })
+          .then(function () {
+            exportButton.disabled = false;
+          });
+      });
+    }
   }
 
   var panel = document.getElementById('job-panel');

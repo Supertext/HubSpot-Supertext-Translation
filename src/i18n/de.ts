@@ -207,4 +207,38 @@ export const de: Messages = {
     'Der API-Schlüssel konnte nicht geprüft werden, weil Supertext nicht erreichbar ist. Die Einstellungen sind gespeichert; prüfen Sie ihn später erneut.',
   'keyCheck.error':
     'Der API-Schlüssel konnte nicht geprüft werden: Supertext hat mit einem Fehler geantwortet ({status}). Die Einstellungen sind gespeichert; prüfen Sie ihn später erneut.',
+
+  // Translation files
+  'nav.import': 'Übersetzung importieren',
+  'export.heading': '3. Oder: Für Übersetzung exportieren',
+  'export.intro':
+    'Laden Sie die Texte als Datei für eine Übersetzerin, ein Übersetzungstool oder die Web-App von Supertext herunter und bringen Sie die übersetzte Datei unter Übersetzung importieren zurück. Kein API-Schlüssel nötig.',
+  'export.format': 'Dateiformat',
+  'export.xliff': 'XLIFF 1.2 (für Übersetzungstools)',
+  'export.html': 'HTML (eine Sprache pro Datei)',
+  'export.oneLanguage': 'Wählen Sie für eine HTML-Datei genau eine Sprache.',
+  'export.download': 'Datei herunterladen',
+  'import.heading': 'Übersetzung importieren',
+  'import.intro':
+    'Bringen Sie eine Datei zurück, die Sie unter Übersetzen → Für Übersetzung exportieren heruntergeladen und von einer Übersetzerin, einem Übersetzungstool oder der Web-App von Supertext übersetzen lassen haben. Jede Sprachversion wird wie eine Supertext-Übersetzung als Entwurf in HubSpot geschrieben.',
+  'import.file': 'Übersetzte Datei (XLIFF oder HTML)',
+  'import.fileHelp': 'Höchstens 10 MB. Die Datei sagt selbst, zu welchem Inhalt und welcher Sprache sie gehört.',
+  'import.includeChanged': 'Auch Texte importieren, deren Ausgangstext sich seit dem Export geändert hat',
+  'import.overwriteHelp': 'Ohne diese Option bleiben Sprachen, die schon eine Version haben, unverändert.',
+  'import.submit': 'Übersetzung importieren',
+  'import.results': 'Importierte Dateien',
+  'import.ok': 'Importiert: {count}',
+  'import.changed': 'Übersprungen, Ausgangstext seit dem Export geändert: {count}',
+  'import.untranslated': 'In der Datei nicht übersetzt: {count}',
+  'import.invalid': 'Formatierung verändert, nicht importiert: {count}',
+  'import.missing': 'Nicht in der Datei: {count}',
+  'error.fileNothing': 'Nichts zu übersetzen.',
+  'error.fileHtmlOneLanguage': 'Wählen Sie für eine HTML-Datei genau eine Sprache.',
+  'error.fileMissing': 'Wählen Sie eine Datei.',
+  'error.fileInvalid': 'Diese Datei ist keine gültige XLIFF- oder HTML-Übersetzungsdatei.',
+  'error.fileMissingMetadata': 'Diese Datei wurde nicht von der Supertext-App exportiert, oder ihr Kopfbereich wurde entfernt.',
+  'error.fileTooLarge': 'Die Datei ist zu gross (höchstens 10 MB).',
+  'error.fileOtherSystem': 'Diese Datei gehört zu einem anderen System ({plugin}).',
+  'error.fileNotFound': 'Der Inhalt, aus dem diese Datei exportiert wurde, existiert nicht mehr.',
+  'error.fileNoLanguage': 'Die Website hat keine Sprache {language}.',
 };

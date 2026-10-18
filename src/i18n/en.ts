@@ -212,6 +212,40 @@ export const en = {
     "The API key couldn't be checked because Supertext can't be reached. The settings are saved; check again later.",
   'keyCheck.error':
     "The API key couldn't be checked: Supertext answered with an error ({status}). The settings are saved; check again later.",
+
+  // Translation files
+  'nav.import': 'Import translation',
+  'export.heading': '3. Or: Export for translation',
+  'export.intro':
+    'Download the texts as a file for a translator, a translation tool or Supertext\'s web app, and bring the translated file back under Import translation. No API key needed.',
+  'export.format': 'File format',
+  'export.xliff': 'XLIFF 1.2 (for translation tools)',
+  'export.html': 'HTML (one language per file)',
+  'export.oneLanguage': 'Choose exactly one language for an HTML file.',
+  'export.download': 'Download file',
+  'import.heading': 'Import translation',
+  'import.intro':
+    'Bring back a file exported under Translate → Export for translation, translated by a translator, a translation tool or Supertext\'s web app. Each language version is written as a draft in HubSpot, like a Supertext translation.',
+  'import.file': 'Translated file (XLIFF or HTML)',
+  'import.fileHelp': 'At most 10 MB. The file says which item and language it belongs to.',
+  'import.includeChanged': 'Also import texts whose source changed since the export',
+  'import.overwriteHelp': 'Without this option, languages that have a version already are kept.',
+  'import.submit': 'Import translation',
+  'import.results': 'Imported files',
+  'import.ok': 'Imported: {count}',
+  'import.changed': 'Skipped, source changed since the export: {count}',
+  'import.untranslated': 'Not translated in the file: {count}',
+  'import.invalid': 'Formatting changed, not imported: {count}',
+  'import.missing': 'Not in the file: {count}',
+  'error.fileNothing': 'Nothing to translate.',
+  'error.fileHtmlOneLanguage': 'Choose exactly one language for an HTML file.',
+  'error.fileMissing': 'Choose a file.',
+  'error.fileInvalid': "This file isn't a valid XLIFF or HTML translation file.",
+  'error.fileMissingMetadata': "This file wasn't exported by the Supertext app, or its header was removed.",
+  'error.fileTooLarge': 'The file is too large (at most 10 MB).',
+  'error.fileOtherSystem': 'This file belongs to another system ({plugin}).',
+  'error.fileNotFound': 'The item this file was exported from no longer exists.',
+  'error.fileNoLanguage': 'The site has no language {language}.',
 } as const;
 
 export type MessageKey = keyof typeof en;

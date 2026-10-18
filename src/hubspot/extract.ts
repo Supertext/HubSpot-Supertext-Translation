@@ -13,6 +13,8 @@ import { hasLetters, plainSegment, RichText, segmentResult, type Segment } from 
  */
 
 interface Unit {
+  /** Stable key of the text in the item (translation files): field path, `.N` for the Nth text of an HTML or a line. */
+  key: string;
   segment: Segment;
   apply(value: string): void;
 }
@@ -25,42 +27,55 @@ export class Extraction {
     return this.units.map((unit) => unit.segment);
   }
 
+  /** The units' keys, in the order of `segments` (unique). */
+  get keys(): string[] {
+    return this.units.map((unit) => unit.key);
+  }
+
   get size(): number {
     return this.units.length;
   }
 
+  /** A unique key: the path, or `<path>~2`… if a text at that path exists already. */
+  private keyFor(key: string | undefined): string {
+    const base = key || `#${this.units.length}`;
+    let candidate = base;
+    for (let n = 2; this.units.some((unit) => unit.key === candidate); n++) candidate = `${base}~${n}`;
+    return candidate;
+  }
+
   /** A plain text; `set` receives the translation. Texts without letters are left out. */
-  addPlain(text: unknown, set: (value: string) => void): void {
+  addPlain(text: unknown, set: (value: string) => void, key?: string): void {
     if (typeof text !== 'string' || !hasLetters(text)) return;
     const segment = plainSegment(text.trim());
     const lead = text.match(/^\s*/)?.[0] ?? '';
     const trail = text.match(/\s*$/)?.[0] ?? '';
-    this.units.push({ segment, apply: (value) => set(lead + segmentResult(segment, value) + trail) });
+    this.units.push({ key: this.keyFor(key), segment, apply: (value) => set(lead + segmentResult(segment, value) + trail) });
   }
 
   /** Plain text over several lines (an email's plain-text version): one segment per line. */
-  addLines(text: unknown, set: (value: string) => void): void {
+  addLines(text: unknown, set: (value: string) => void, key?: string): void {
     if (typeof text !== 'string' || !hasLetters(text)) return;
     const lines = text.split('\n');
     const done = [...lines];
-    lines.forEach((line, index) => this.addPlain(line, (value) => (done[index] = value)));
+    lines.forEach((line, index) => this.addPlain(line, (value) => (done[index] = value), key && `${key}.${index}`));
     this.finishers.push(() => set(done.join('\n')));
   }
 
   /** HTML: one segment per paragraph; `set` receives the whole translated HTML. */
-  addHtml(html: unknown, set: (value: string) => void): void {
+  addHtml(html: unknown, set: (value: string) => void, key?: string): void {
     if (typeof html !== 'string' || !hasLetters(html)) return;
     const document = new RichText(html);
     const translations = new Map<number, string>();
     document.segments.forEach((segment, index) => {
-      this.units.push({ segment, apply: (value) => translations.set(index, value) });
+      this.units.push({ key: this.keyFor(key && `${key}.${index}`), segment, apply: (value) => translations.set(index, value) });
     });
     this.finishers.push(() => set(document.apply(translations)));
   }
 
-  /** Module data: walks the object in place (it must be the copy that is written back). */
-  addModules(value: unknown): void {
-    walk(value, [], this);
+  /** Module data: walks the object in place (it must be the copy that is written back). `key`: the field's name. */
+  addModules(value: unknown, key?: string): void {
+    walk(value, key ? [key] : [], this);
   }
 
   /**
@@ -95,8 +110,8 @@ function walk(value: unknown, path: string[], extraction: Extraction): void {
     const textList = TEXT_KEY.test((path[path.length - 1] ?? '').toLowerCase());
     value.forEach((item, index) => {
       if (typeof item === 'string') {
-        if (textList) visitString(item, path, extraction, (text) => (value[index] = text));
-      } else walk(item, path, extraction);
+        if (textList) visitString(item, [...path, String(index)], extraction, (text) => (value[index] = text), path);
+      } else walk(item, [...path, String(index)], extraction);
     });
     return;
   }
@@ -115,9 +130,10 @@ function walk(value: unknown, path: string[], extraction: Extraction): void {
   }
 }
 
-function visitString(text: string, path: string[], extraction: Extraction, set: (value: string) => void) {
+/** `fieldPath`: where the field's name is (a list item's path ends with its index). */
+function visitString(text: string, path: string[], extraction: Extraction, set: (value: string) => void, fieldPath = path) {
   if (NOT_TEXT.test(text.trim()) || !hasLetters(text)) return;
-  const key = (path[path.length - 1] ?? '').toLowerCase();
-  if (key === 'html' || key.endsWith('_html') || HTML_LIKE.test(text)) extraction.addHtml(text, set);
-  else extraction.addPlain(text, set);
+  const key = (fieldPath[fieldPath.length - 1] ?? '').toLowerCase();
+  if (key === 'html' || key.endsWith('_html') || HTML_LIKE.test(text)) extraction.addHtml(text, set, path.join('.'));
+  else extraction.addPlain(text, set, path.join('.'));
 }

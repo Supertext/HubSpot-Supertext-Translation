@@ -203,4 +203,38 @@ export const fr: Messages = {
     "La clé API n'a pas pu être vérifiée, car Supertext n'est pas joignable. Les paramètres sont enregistrés ; réessayez plus tard.",
   'keyCheck.error':
     "La clé API n'a pas pu être vérifiée : Supertext a répondu par une erreur ({status}). Les paramètres sont enregistrés ; réessayez plus tard.",
+
+  // Translation files
+  'nav.import': 'Importer une traduction',
+  'export.heading': '3. Ou : Exporter pour traduction',
+  'export.intro':
+    'Téléchargez les textes dans un fichier pour un traducteur, un outil de traduction ou l’application web de Supertext, puis rapportez le fichier traduit sous Importer une traduction. Aucune clé API n’est nécessaire.',
+  'export.format': 'Format de fichier',
+  'export.xliff': 'XLIFF 1.2 (pour les outils de traduction)',
+  'export.html': 'HTML (une langue par fichier)',
+  'export.oneLanguage': 'Choisissez exactement une langue pour un fichier HTML.',
+  'export.download': 'Télécharger le fichier',
+  'import.heading': 'Importer une traduction',
+  'import.intro':
+    'Rapportez un fichier exporté sous Traduire → Exporter pour traduction et traduit par un traducteur, un outil de traduction ou l’application web de Supertext. Chaque version linguistique est enregistrée comme brouillon dans HubSpot, comme une traduction Supertext.',
+  'import.file': 'Fichier traduit (XLIFF ou HTML)',
+  'import.fileHelp': '10 Mo au maximum. Le fichier indique lui-même à quel contenu et à quelle langue il appartient.',
+  'import.includeChanged': 'Importer aussi les textes dont la source a changé depuis l’export',
+  'import.overwriteHelp': 'Sans cette option, les langues qui ont déjà une version sont conservées.',
+  'import.submit': 'Importer une traduction',
+  'import.results': 'Fichiers importés',
+  'import.ok': 'Importés : {count}',
+  'import.changed': 'Ignorés, source modifiée depuis l’export : {count}',
+  'import.untranslated': 'Non traduits dans le fichier : {count}',
+  'import.invalid': 'Mise en forme modifiée, non importés : {count}',
+  'import.missing': 'Absents du fichier : {count}',
+  'error.fileNothing': 'Rien à traduire.',
+  'error.fileHtmlOneLanguage': 'Choisissez exactement une langue pour un fichier HTML.',
+  'error.fileMissing': 'Choisissez un fichier.',
+  'error.fileInvalid': 'Ce fichier n’est pas un fichier de traduction XLIFF ou HTML valide.',
+  'error.fileMissingMetadata': 'Ce fichier n’a pas été exporté par l’application Supertext, ou son en-tête a été supprimé.',
+  'error.fileTooLarge': 'Le fichier est trop volumineux (10 Mo au maximum).',
+  'error.fileOtherSystem': 'Ce fichier appartient à un autre système ({plugin}).',
+  'error.fileNotFound': 'Le contenu à partir duquel ce fichier a été exporté n’existe plus.',
+  'error.fileNoLanguage': 'Le site n’a pas de langue {language}.',
 };

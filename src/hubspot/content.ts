@@ -206,13 +206,13 @@ const clone = <T>(value: T): T => (value === undefined || value === null ? value
 export function extractItem(kind: Kind, draft: Item): { extraction: Extraction; fields: () => Record<string, unknown> } {
   const extraction = new Extraction();
   const fields: Record<string, unknown> = {};
-  const plain = (name: string) => extraction.addPlain(draft[name], (value) => (fields[name] = value));
-  const html = (name: string) => extraction.addHtml(draft[name], (value) => (fields[name] = value));
-  const modules = (target: Record<string, unknown>, source: Record<string, unknown>, names: string[]) => {
+  const plain = (name: string) => extraction.addPlain(draft[name], (value) => (fields[name] = value), name);
+  const html = (name: string) => extraction.addHtml(draft[name], (value) => (fields[name] = value), name);
+  const modules = (target: Record<string, unknown>, source: Record<string, unknown>, names: string[], prefix = '') => {
     for (const name of names) {
       if (!source[name] || typeof source[name] !== 'object') continue;
       target[name] = clone(source[name]);
-      extraction.addModules(target[name]);
+      extraction.addModules(target[name], prefix + name);
     }
   };
 
@@ -234,14 +234,14 @@ export function extractItem(kind: Kind, draft: Item): { extraction: Extraction; 
       const content = draft.content && typeof draft.content === 'object' ? clone(draft.content as Record<string, unknown>) : undefined;
       if (content) {
         // The whole content object goes back (styles and layout unchanged), with the modules translated.
-        modules(content, content, ['widgets', 'widgetContainers']);
-        extraction.addLines(content.plainTextVersion, (value) => (content.plainTextVersion = value));
+        modules(content, content, ['widgets', 'widgetContainers'], 'content.');
+        extraction.addLines(content.plainTextVersion, (value) => (content.plainTextVersion = value), 'content.plainTextVersion');
         fields.content = content;
       }
       const web = draft.webversion && typeof draft.webversion === 'object' ? clone(draft.webversion as Record<string, unknown>) : undefined;
       if (web && (web.title || web.metaDescription)) {
-        extraction.addPlain(web.title, (value) => (web.title = value));
-        extraction.addPlain(web.metaDescription, (value) => (web.metaDescription = value));
+        extraction.addPlain(web.title, (value) => (web.title = value), 'webversion.title');
+        extraction.addPlain(web.metaDescription, (value) => (web.metaDescription = value), 'webversion.metaDescription');
         fields.webversion = web;
       }
       break;

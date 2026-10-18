@@ -63,6 +63,14 @@ draft_of() { # path language sourceField sourceId
 grep -q 'Über uns' <<< "$(draft_of /cms/pages/2026-09/site-pages de-ch translatedFromId 101)" || fail 'German page variant in HubSpot'
 grep -q 'Nos chocolats d’automne sont arrivés' <<< "$(draft_of /marketing/emails/2026-09 fr-ch clonedFrom 401)" || fail 'French email clone in HubSpot'
 
+# Translation files: export the landing page as XLIFF, "translate" it, import it (no Supertext call).
+curl -fs -c "$jar" -b "$jar" -X POST $app/api/export -H "X-CSRF-Token: $csrf" -H 'Content-Type: application/json' \
+  -d '{"kind":"landing-page","itemId":"201","languages":["de-ch"],"format":"xliff"}' -o "$work/export.xlf" || fail 'export for translation'
+node -e "const fs=require('fs');const x=fs.readFileSync(process.argv[1],'utf8');fs.writeFileSync(process.argv[2],x.replace(/<source>([\s\S]*?)<\/source>/g,(a,s)=>a+'<target>DE '+s+'</target>'))" "$work/export.xlf" "$work/translated.xlf"
+imported=$(curl -fs -c "$jar" -b "$jar" -X POST $app/import -F "csrf=$csrf" -F overwrite=1 -F "file=@$work/translated.xlf") || fail 'import translation'
+grep -q 'New version (draft)' <<< "$imported" || fail "import summary: $imported"
+grep -q 'DE Advent calendar 2026' <<< "$(draft_of /cms/pages/2026-09/landing-pages de-ch translatedFromId 201)" || fail 'imported landing page variant in HubSpot'
+
 code=$(curl -s -o /dev/null -w '%{http_code}' -X POST $app/api/jobs -H 'Content-Type: application/json' -d '{}')
 [ "$code" = "401" ] || fail "API without a session answered $code"
 echo 'Smoke test passed.'

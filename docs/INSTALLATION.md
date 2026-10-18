@@ -92,6 +92,13 @@ No content, no API key and no personal data. Being a hosted app, it has no ping 
 
 Everyone who has connected the HubSpot account in the app. The app acts with the access you granted at install, not with each person's HubSpot permissions.
 
+## Translation files (export and import)
+
+Editors can download an item's texts as an XLIFF 1.2 or HTML file (*Translate → Export for translation*), have it translated anywhere, and import the translated file (*Import translation* in the top bar); see the [user guide](USER_GUIDE.md#export-for-translation-and-import-a-translated-file). There is nothing to configure, and it works without a Supertext API key:
+
+- **Who:** everyone who can translate in the app (see *Who can translate*). Files can only be imported into the HubSpot account they were exported from, and only for the languages chosen under Settings.
+- **Uploads:** at most 10 MB, refused before they are read; read in memory and never stored. Only files exported by this app are accepted, and translations may only use the formatting and the personalization tokens of the current original.
+
 ## Updating
 
 Nothing to do: the app runs on Supertext's servers and is updated there. The settings page shows the current version.

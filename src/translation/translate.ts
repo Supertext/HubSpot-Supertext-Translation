@@ -8,6 +8,7 @@ import {
   type Item,
   type Kind,
 } from '../hubspot/content.js';
+import type { Extraction } from '../hubspot/extract.js';
 import type { Politeness, SupertextClient } from '../supertext/client.js';
 import type { JobItem } from '../store/store.js';
 
@@ -20,7 +21,10 @@ import type { JobItem } from '../store/store.js';
 
 export interface TranslateArgs {
   client: HubSpotClient;
-  supertext: Pick<SupertextClient, 'translateSegments'>;
+  /** Translates the segments (API translation); not needed with `produce`. */
+  supertext?: Pick<SupertextClient, 'translateSegments'>;
+  /** Supplies the translations instead of Supertext's API (an imported translation file): one per segment. */
+  produce?: (extraction: Extraction) => string[];
   kind: Kind;
   /** The item (metadata). */
   source: Item;
@@ -51,10 +55,11 @@ export async function translateItem(args: TranslateArgs): Promise<TranslateResul
   /** Translates and checks every segment (HubL tokens) before anything is written; returns the fields to write. */
   const translate = async (): Promise<Record<string, unknown>> => {
     const segments = extraction.segments;
-    const translated =
-      segments.length === 0
+    const translated = args.produce
+      ? args.produce(extraction)
+      : segments.length === 0
         ? []
-        : await args.supertext.translateSegments(
+        : await args.supertext!.translateSegments(
             segments.map((segment) => segment.html),
             { targetLanguage: args.supertextTarget, sourceLanguage: args.sourceLanguage, politeness: args.politeness },
           );

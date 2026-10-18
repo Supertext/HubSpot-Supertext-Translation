@@ -11,7 +11,7 @@ For editors. Once the app is set up (see [INSTALLATION.md](INSTALLATION.md)), yo
 3. Under **Choose the languages**, tick the languages. The code next to each (e.g. `de-CH`) is the variant Supertext translates into.
 4. Click **Translate into 2 languages with Supertext**.
 
-   ![Translate with Supertext: Website pages, the page About us selected, no versions yet; Swiss French and Swiss High German ticked, German and Italian (Switzerland) not; Update existing versions ticked, with its warning; the button Translate into 2 languages with Supertext](images/translate-page.png)
+   ![Translate with Supertext: Website pages, the page About us selected, no versions yet; Swiss French and Swiss High German ticked, German and Italian (Switzerland) not; Update existing versions ticked, with its warning; the button Translate into 2 languages with Supertext; below it 3. Or: Export for translation, with the file formats and Download file](images/translate-page.png)
 
 5. Each language takes a few seconds. The **Translation** box shows the result per language, with a link to each draft in HubSpot. You can leave the page meanwhile; the translation goes on.
 
@@ -28,6 +28,51 @@ Marketing emails work the same way; each language gets its own copy of the email
 The app's pages are in English, German, French or Italian, in your browser's language unless you choose another one under **Settings → Interface language** (for this browser only). They work on a phone too: on a small screen the list of content scrolls sideways to show all your languages.
 
 ![The translate page in German: Blogbeiträge, the post How we roast our cocoa beans selected, Sprachen auswählen and the button In 3 Sprachen mit Supertext übersetzen](images/translate-page-de.png)
+
+## Export for translation and import a translated file
+
+Instead of letting Supertext translate right away, you can download an item's texts as a file, have it translated elsewhere (by a translator, in a translation tool such as Trados, memoQ or Phrase, or in Supertext's web app) and import the translated file again. The versions are made exactly as with a Supertext translation. This doesn't use Supertext's API, so it works without an API key.
+
+### Export
+
+1. On **Translate**, choose the item and tick the languages, as for translating.
+2. Under **3. Or: Export for translation**, choose the **File format**:
+   - **XLIFF 1.2 (for translation tools)**: the better choice for translators and translation tools. One file holds all ticked languages; formatting and personalization tokens appear as protected tags the translator can move but not break.
+   - **HTML (one language per file)**: for Supertext's web app or anyone who translates HTML. Tick exactly one language.
+3. Click **Download file**. The file is called `hubspot-<item ID>-<language>.xlf` (or `.html`; with several languages `hubspot-<item ID>.xlf`).
+
+   ![3. Or: Export for translation: File format XLIFF 1.2 (for translation tools) or HTML (one language per file), HTML chosen, and the button Download file](images/export-section.png)
+
+The file holds exactly the texts the app would send to Supertext (see *What is translated*). If the item has none, you get *Nothing to translate.* and no file.
+
+Send the file to your translator, or upload it to Supertext's web app. In an **HTML file**, the translator must leave the head (the `supertext:` lines), the `data-st-id` attributes and the empty `<span data-hs="…">` placeholders (your personalization tokens) alone, and translate only the text between the tags. An HTML file can't mark a text as "not translated": imported unchanged, it writes the original text into the language version.
+
+### Import
+
+1. Go to **Import translation** (top bar).
+2. Choose the **Translated file (XLIFF or HTML)** (at most 10 MB). The file says which item and language it belongs to.
+3. Leave **Also import texts whose source changed since the export** off, unless you want translations of texts that were edited in HubSpot after the export.
+4. **Update existing versions** works as on the Translate page: ticked, an existing version's draft is replaced; unticked, that language is kept.
+5. Click **Import translation**.
+
+   ![Import translation: Translated file (XLIFF or HTML) with hubspot-201-de-ch.html chosen, Also import texts whose source changed since the export (not ticked), Update existing versions (ticked), the button Import translation](images/import-form.png)
+
+The page then shows a summary per item and language, with a link to the draft in HubSpot:
+
+![Imported files: Advent calendar 2026 (Landing pages), Swiss High German, New version (draft), Imported: 5, Open in HubSpot](images/import-results.png)
+
+| Line | Meaning |
+| --- | --- |
+| *New version (draft)* / *Draft updated* / *Version exists, kept* | What happened to the language version, as on the Translate page. |
+| *Imported: n* | Texts written into the version. |
+| *Skipped, source changed since the export: n* | The original text was edited after the export, so the translation may be outdated. Import again with the option ticked to use it anyway. |
+| *Not translated in the file: n* | The file has no translation for these texts. |
+| *Formatting changed, not imported: n* | The translation broke or added formatting (tags), or lost a personalization token. |
+| *Not in the file: n* | Texts added to the item after the export. |
+
+Texts that weren't imported keep what an existing version has there; in a new version they stay in the original language. Nothing is written when no text could be imported.
+
+Errors instead of a summary: *This file isn't a valid XLIFF or HTML translation file.*, *This file wasn't exported by the Supertext app, or its header was removed.*, *The file is too large (at most 10 MB).*, *This file belongs to another system (…)* (exported from another Supertext plugin), *The item this file was exported from no longer exists.* (also for a file from another HubSpot account) and *The site has no language …* (the language was removed under Settings).
 
 ## Where the versions go
 

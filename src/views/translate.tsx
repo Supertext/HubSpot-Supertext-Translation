@@ -166,6 +166,33 @@ export function TranslatePage(props: TranslatePageProps) {
                 </button>
                 <span id="form-message" class="muted" role="status"></span>
               </div>
+
+              <div id="export-section">
+              <h2>{t.t('export.heading')}</h2>
+              <p class="muted">{t.t('export.intro')}</p>
+              <fieldset class="formats">
+                <legend>{t.t('export.format')}</legend>
+                <label class="inline">
+                  <input type="radio" name="format" value="xliff" checked />
+                  {t.t('export.xliff')}
+                </label>
+                <label class="inline">
+                  <input type="radio" name="format" value="html" />
+                  {t.t('export.html')}
+                </label>
+              </fieldset>
+              <div class="actions">
+                <button
+                  type="button"
+                  id="export-button"
+                  data-select={t.t('translate.selectSomething')}
+                  data-one={t.t('export.oneLanguage')}
+                >
+                  {t.t('export.download')}
+                </button>
+                <span id="export-message" class="muted" role="status"></span>
+              </div>
+              </div>
             </>
           )}
         </form>

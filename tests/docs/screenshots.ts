@@ -9,7 +9,9 @@
  */
 import { serve } from '@hono/node-server';
 import { serveStatic } from '@hono/node-server/serve-static';
-import { mkdirSync } from 'node:fs';
+import { mkdirSync, mkdtempSync, readFileSync, writeFileSync } from 'node:fs';
+import { tmpdir } from 'node:os';
+import { join } from 'node:path';
 import type { AddressInfo } from 'node:net';
 import { chromium, type Locator, type Page } from 'playwright';
 import { createApp } from '../../src/app.js';
@@ -128,10 +130,32 @@ async function main() {
   await page.uncheck('input[name="language"][value="de"]');
   await shot('translate-page-de', page.locator('#translate-form'));
 
+  // Translation files: export the landing page as HTML for Swiss High German, "translate" it with the
+  // sample translations (as a translator would), import it.
+  await page.goto(`${appUrl}/?kind=landing-page&lang=en`);
+  await page.check('input[name="item"][value="201"]');
+  for (const code of ['fr-ch', 'it-ch', 'de']) await page.uncheck(`input[name="language"][value="${code}"]`);
+  await page.check('input[name="format"][value="html"]');
+  await shot('export-section', page.locator('#export-section'));
+  const [download] = await Promise.all([page.waitForEvent('download'), page.click('#export-button')]);
+  const exported = readFileSync(await download.path(), 'utf8');
+  const german = JSON.parse(readFileSync(new URL('../standin/samples.json', import.meta.url), 'utf8')).de as Record<string, string>;
+  const translated = exported.replace(/(<div data-st-id="\d+">)([\s\S]*?)(<\/div>)/g, (all, open: string, text: string, close: string) =>
+    german[text] ? open + german[text] + close : all,
+  );
+  const file = join(mkdtempSync(join(tmpdir(), 'supertext-')), 'hubspot-201-de-ch.html');
+  writeFileSync(file, translated);
+  await page.goto(`${appUrl}/import`);
+  await page.setInputFiles('input[name="file"]', file);
+  await shot('import-form', page.locator('#import-form'));
+  await page.click('#import-form button.primary');
+  await page.waitForSelector('.job');
+  await shot('import-results', page.locator('.job'));
+
   // Phones: every page must fit a 390 px wide screen (wide tables scroll inside their card).
   const phone = await browser.newPage({ viewport: { width: 390, height: 844 }, deviceScaleFactor: 1, isMobile: true, hasTouch: true });
   await phone.context().addCookies(await page.context().cookies());
-  for (const path of ['/?lang=en', '/?kind=email', '/settings']) {
+  for (const path of ['/?lang=en', '/?kind=email', '/import', '/settings']) {
     await phone.goto(`${appUrl}${path}`);
     const width = await phone.evaluate(() => document.documentElement.scrollWidth);
     if (width > 390) throw new Error(`${path} is ${width}px wide on a phone (390px screen)`);

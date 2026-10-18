@@ -1,5 +1,5 @@
 import type { HubSpotClient } from '../hubspot/client.js';
-import { getDraft, getItem, hasVariants, itemState, summary, type Kind } from '../hubspot/content.js';
+import { getDraft, getItem, hasVariants, itemState, summary, type ContentSummary, type Item, type Kind } from '../hubspot/content.js';
 import { errorInfo, LocalizedError, type ErrorInfo } from '../i18n/error.js';
 import { fromSdk, type SupertextClient } from '../supertext/client.js';
 import { newJobId, type Account, type Job, type JobItem, type Store } from '../store/store.js';
@@ -81,20 +81,35 @@ export async function startJob(deps: JobDeps, request: JobRequest): Promise<{ jo
   return { job, done };
 }
 
-export async function runJob(deps: JobDeps, job: Job): Promise<Job> {
-  const { store } = deps;
-  const account = await store.getAccount(job.accountId);
-  if (!account) throw new LocalizedError('HubSpot is not connected.', 'notConnected');
-  const client = deps.hubspot(account);
-  const supertext = deps.supertext(account);
-  const { kind } = job;
+/** An item ready to be translated: its metadata, draft, language and the versions the app made. */
+export interface PreparedItem {
+  client: HubSpotClient;
+  source: Item;
+  info: ContentSummary;
+  draft: Item;
+  /** HubSpot code of the item's language (or the account's content language). */
+  itemLanguage: string;
+  /** Versions the app recorded for the item (emails): language → ID. */
+  own: Record<string, string>;
+}
 
-  const source = await getItem(client, kind, job.itemId);
+/**
+ * Loads an item for translating (by API or from a translation file). Throws `itemMissing`,
+ * `isTranslation` (a language version itself) or `noSourceLanguage`. `onName` hears the item's name early.
+ */
+export async function prepareItem(
+  deps: Pick<JobDeps, 'store' | 'hubspot'>,
+  account: Account,
+  kind: Kind,
+  itemId: string,
+  onName?: (name: string) => Promise<void>,
+): Promise<PreparedItem> {
+  const client = deps.hubspot(account);
+  const source = await getItem(client, kind, itemId);
   if (!source) throw new LocalizedError('The item no longer exists in HubSpot.', 'itemMissing');
   const info = summary(kind, source);
-  job.itemTitle = info.name;
-  await store.saveJob(job);
-  const records = await store.translations(account.accountId, kind);
+  await onName?.(info.name);
+  const records = await deps.store.translations(account.accountId, kind);
   const madeByApp = [...records.values()].some((languages) => Object.values(languages).includes(info.id));
   if (info.isVariant || madeByApp) {
     throw new LocalizedError('This is a language version of another item. Translate its primary instead.', 'isTranslation');
@@ -107,6 +122,32 @@ export async function runJob(deps: JobDeps, job: Job): Promise<Job> {
     );
   }
   const draft = await getDraft(client, kind, info.id);
+  return { client, source, info, draft, itemLanguage, own: records.get(info.id) ?? {} };
+}
+
+/** The language's existing version to update, if any (an email clone that was deleted or sent doesn't count). */
+export async function existingVersion(item: PreparedItem, kind: Kind, language: string): Promise<string | undefined> {
+  let existingId: string | undefined = hasVariants(kind) ? item.info.translations[hubspotCode(language)] : item.own[language];
+  if (existingId && kind === 'email') {
+    // A clone that was deleted, or sent already, is left alone: a new one is made.
+    const existing = await getItem(item.client, kind, existingId);
+    if (!existing || existing.archived === true || itemState(existing) !== 'draft') existingId = undefined;
+  }
+  return existingId;
+}
+
+export async function runJob(deps: JobDeps, job: Job): Promise<Job> {
+  const { store } = deps;
+  const account = await store.getAccount(job.accountId);
+  if (!account) throw new LocalizedError('HubSpot is not connected.', 'notConnected');
+  const supertext = deps.supertext(account);
+  const { kind } = job;
+
+  const prepared = await prepareItem(deps, account, kind, job.itemId, async (name) => {
+    job.itemTitle = name;
+    await store.saveJob(job);
+  });
+  const { client, source, info, draft, itemLanguage } = prepared;
 
   // The item's language, as Supertext knows it (the same for every target).
   let sourceLanguage: string;
@@ -116,7 +157,6 @@ export async function runJob(deps: JobDeps, job: Job): Promise<Job> {
     throw fromSdk(error);
   }
 
-  const own = records.get(info.id) ?? {};
   for (const language of job.languages) {
     const item: JobItem = { language, state: 'kept' };
     try {
@@ -129,12 +169,7 @@ export async function runJob(deps: JobDeps, job: Job): Promise<Job> {
       } catch (error) {
         throw fromSdk(error); // unsupportedLanguage: nothing is sent for this language
       }
-      let existingId: string | undefined = hasVariants(kind) ? info.translations[hubspotCode(language)] : own[language];
-      if (existingId && kind === 'email') {
-        // A clone that was deleted, or sent already, is left alone: a new one is made.
-        const existing = await getItem(client, kind, existingId);
-        if (!existing || existing.archived === true || itemState(existing) !== 'draft') existingId = undefined;
-      }
+      const existingId = await existingVersion(prepared, kind, language);
       const result = await translateItem({
         client,
         supertext,

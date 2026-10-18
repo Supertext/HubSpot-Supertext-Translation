@@ -6,7 +6,7 @@ import { LOCALES, type Translator } from '../i18n/index.js';
 /** What every page needs: the language, the current page, the CSRF token and the connected account. */
 export interface PageContext {
   t: Translator;
-  page: 'connect' | 'translate' | 'settings';
+  page: 'connect' | 'translate' | 'import' | 'settings';
   /** Empty on the connect page (no session). */
   csrf: string;
   accountName?: string;
@@ -66,6 +66,9 @@ export function Layout(props: { ctx: PageContext; title: string; children: Child
             <nav class="tabs">
               <a href="/" class={ctx.page === 'translate' ? 'tab active' : 'tab'}>
                 {t.t('nav.translate')}
+              </a>
+              <a href="/import" class={ctx.page === 'import' ? 'tab active' : 'tab'}>
+                {t.t('nav.import')}
               </a>
               <a href="/settings" class={ctx.page === 'settings' ? 'tab active' : 'tab'}>
                 {t.t('nav.settings')}

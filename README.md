@@ -11,6 +11,7 @@ Translate your HubSpot content with [Supertext](https://www.supertext.com) AI: w
 - **Drafts only:** nothing is published or sent; the original is never changed.
 - Translates titles, meta descriptions, subject lines, preview text, rich text and the text fields of modules; keeps layout, images, links, forms and **HubL / personalization tokens** (`{{ contact.firstname }}`).
 - Existing language versions get a fresh translation of their drafts; untick *Update existing versions* to keep them.
+- **Translation files:** *Export for translation* as XLIFF 1.2 (for translation tools) or HTML, and *Import translation* of the translated file, with a summary of what was imported.
 - The app's pages are in English, German, French and Italian.
 
 **Needs:** a HubSpot account with Content Hub or Marketing Hub (Professional or Enterprise for multi-language content) and a Supertext account with an API key. No Supertext account yet? [Create one at supertext.com](https://www.supertext.com/person/en/account/signin). Generate your API key at [supertext.com → Integrations → API](https://www.supertext.com/en/integrations/api) (requires the Admin role).

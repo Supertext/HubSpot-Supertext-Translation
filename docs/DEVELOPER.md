@@ -18,7 +18,8 @@ src/
     extract.ts            Extraction: segments of an item and writing the translations back; the module (widget) walker
     rich-text.ts          HTML ↔ segments: one per paragraph, HubL placeholders, alt/title attributes
   translation/
-    translate.ts          one item × one language: segments → Supertext → version draft
+    translate.ts          one item × one language: segments → Supertext (or `produce`: an imported file) → version draft
+    files.ts              translation files: export (XLIFF/HTML) and import with the SDK's TranslationFiles, reference format
     jobs.ts               a job: one item × languages, progress, error handling
     languages.ts          HubSpot language codes, Supertext mapping, names
   supertext/
@@ -28,7 +29,7 @@ src/
     postgres.ts           PostgreSQL store (creates its database and tables)
   reporting.ts            Commando Center glue (Supertext Plugin Health)
   i18n/                   en, de, fr, it messages; translator; LocalizedError
-  views/                  server-rendered pages (hono/jsx): connect, translate, job panel and history, settings
+  views/                  server-rendered pages (hono/jsx): connect, translate (with Export for translation), import, job panel and history, settings
 public/                   app.js (selection, start, polling, test connection), app.css (Supertext's look, see Look and feel), supertext-logo.svg, favicon.svg, fonts/ (Inter, SIL Open Font License); linked as /static/app.css?v=<content hash> (views/layout.tsx), cached for a year, pages never cached
 hubspot-project/          the HubSpot app definition (developer platform 2026.09): OAuth, scopes, redirect URLs
 scripts/probe.ts          look at a real account (read-only)
@@ -75,6 +76,17 @@ Lists: `limit=25&sort=-updatedAt&archived=false`, cursor `paging.next.after`. La
 6. **Version:** an existing version (HubSpot's `translations`; for emails the app's record, if the copy still exists and is a draft) gets its draft updated with *Update existing versions* (ticked by default on the Translate page; the API's `overwrite` is false unless sent), or is kept when it is unticked. Otherwise a new one is made **before** translating (`create-language-variation` or `clone`), so a version HubSpot refuses (a blog without that language: HubSpot's 400 *Blog does not have a variation for language fr-ch* becomes `blogLanguageMissing`) costs no Supertext translation. Then the segments are translated and checked, and the version's draft is written with `PATCH …/draft` (the whole module objects and, for emails, the whole `content` object, so styles and layout stay). If translating or writing fails, the new version is removed again (archived). Articles are created with their content in one call, after translating. Nothing is published.
 7. **Errors:** Supertext authentication and limit, HubSpot authentication/permission and item problems stop the job; anything else (e.g. a blog without the language's variant, `INVALID_LANGUAGE_PAIR`) fails only that language. Jobs still running when the app restarts are marked *interrupted* on the next start.
 
+## Translation files (export and import)
+
+*Export for translation* (a section of the Translate page, `POST /api/export`, JSON body like `/api/jobs` plus `format`, answered with the file) and *Import translation* (its own page, `GET`/`POST /import`, multipart with `csrf`, `file`, `includeChanged`, `overwrite`) use the SDK's `TranslationFiles` (SDK 0.5.0, imported from `supertext-sdk`, not `supertext-sdk/v1`: it doesn't call the API). The glue is `src/translation/files.ts`:
+
+- **Segments:** the item's extraction (`extractItem`), now with a stable `key` per unit (`Extraction.keys`): the field path (`htmlTitle`, `widgets.rich_text.body.html.0` for the first text of an HTML field, `content.plainTextVersion.3` for a line, `layoutSections.dnd_area.rows.0.0.params.html.0`, `webversion.title`); a repeated path gets `~2`. Every segment goes into the file as HTML (`html: true`), so the HubL placeholders `<span data-hs="N"></span>` become protected inline codes in XLIFF.
+- **Job metadata:** `plugin` = `HubSpot-Supertext-Translation`; `sourceLanguage` = the item's language as a Supertext source, `targetLanguage` = the language's Supertext code (`resolvedTarget`), else the HubSpot code, so a language without a Supertext code can still be exported.
+- **Reference format:** `<HubSpot account ID>:<kind>:<item ID>:<language>` (HubSpot code), each part URI-encoded, e.g. `48210377:site-page:101:de-ch` (`formatReference`/`parseReference`). A file from another account is *not found*.
+- **Export:** `prepareItem` (the same checks as a job: exists, not a language version, has a language), XLIFF = one job per language, HTML = exactly one; file name `hubspot-<item ID>[-<language>].xlf|.html`.
+- **Import:** the body is read with a 10 MB limit (`Content-Length` and while reading; nothing is stored), `TranslationFiles.read`, then per job: `plugin` must be ours (`fileOtherSystem`), the reference must parse and name this account (`fileNotFound`), the language must be one of the settings' targets (`fileNoLanguage`), `prepareItem` loads the item (`itemMissing` → `fileNotFound`). `importTranslations` with the item's current segments; `ok` results (and `source_changed` with *Also import …*) are checked with `segmentResult` (HubL placeholders exactly once, else counted as invalid). With nothing to import nothing is written. Otherwise `existingVersion` decides as in a job (kept without *Update existing versions*), and `translateItem` runs with `produce` instead of Supertext: imported texts, else the existing version's own segment at the same key (if its HubL matches), else the original, so the version is made, written and removed on failure exactly as for an API translation, and recorded with `saveTranslation`.
+- The result per job: `state` (`created`/`updated`/`kept`), `targetId`, the counts, or an `error` (`ErrorInfo`), rendered by `views/import.tsx`.
+
 ## Interface languages
 
 English, German, French and Italian. HubSpot doesn't pass the user's language to outside pages (only to UI extensions inside HubSpot), so the app follows the browser's `Accept-Language`, unless *Settings → Interface language* chose one: that choice is per browser, not per account (cookie `st_locale`, a year; *Automatic* deletes it), so colleagues sharing an account each keep their own. The connect page offers the four languages as links (`?lang=`, which sets the same cookie). If the browser asks for none of the four, the pages are in English. Strings live in `src/i18n/{en,de,fr,it}.ts`; `en.ts` defines the keys and the others are typed `Messages`, so a missing key fails `npm run typecheck`, and `tests/i18n.test.ts` checks keys, placeholders, URLs, "Supertext" and "HubSpot". **Every new or changed string gets all four languages in the same commit**, formal address (Sie, vous, Lei) and HubSpot's own terms (Website-Seiten, Landingpages, Blogbeiträge, Marketing-E-Mails, Wissensdatenbank; pages de destination, e-mails marketing, base de connaissances; landing page, e-mail di marketing, knowledge base), French narrow no-break space before `? ! : ;`. Language names come from `Intl.DisplayNames`. Errors are `LocalizedError`s (English message for logs, `code` → `error.<code>`).
@@ -91,7 +103,7 @@ AI file translation API v1 at `https://api.supertext.com/v1/` (upload an HTML fi
 
 ## Supertext SDK
 
-All Supertext calls go through the [Supertext SDK](https://github.com/Supertext/Supertext-API-SDK-and-Guide) (`sdk/typescript`, npm name `supertext-sdk`, imported as `supertext-sdk/v1`), wrapped by `src/supertext/client.ts`. It isn't on npm yet, so it is a file dependency (`"supertext-sdk": "file:vendor/supertext-sdk"`): `vendor/supertext-sdk/` holds its built JavaScript and type declarations, a lean `package.json`, `LICENSE`, `COMMIT` (the SDK commit), `VERSION` and a `README.md` (SDK 0.4.0, commit `6aaad33`). The Docker image copies `vendor/` before `npm ci`. Never edit it: fix the SDK repository and copy it again:
+All Supertext calls go through the [Supertext SDK](https://github.com/Supertext/Supertext-API-SDK-and-Guide) (`sdk/typescript`, npm name `supertext-sdk`, imported as `supertext-sdk/v1`), wrapped by `src/supertext/client.ts`. It isn't on npm yet, so it is a file dependency (`"supertext-sdk": "file:vendor/supertext-sdk"`): `vendor/supertext-sdk/` holds its built JavaScript and type declarations, a lean `package.json`, `LICENSE`, `COMMIT` (the SDK commit), `VERSION` and a `README.md` (SDK 0.5.0, commit `a47ca07`). The Docker image copies `vendor/` before `npm ci`. Never edit it: fix the SDK repository and copy it again:
 
 ```bash
 scripts/vendor-sdk.sh                  # latest main of the SDK repository
@@ -169,6 +181,8 @@ bash scripts/smoke.sh   # after build: the built app against the stand-ins
 
 The protocol itself (multipart, retries, polling, packing, language codes, error mapping) is tested in the SDK repository against its shared test vectors.
 
+`tests/files.test.ts` covers translation files through the app against the stand-ins: the reference format; export (keys, mapped languages, HubL as codes, HTML with one language, no Supertext call); import (a new variant written as a draft, HubL lost → not imported, existing versions kept or updated with their own text where nothing is imported, `source_changed` only with the option, other system, other account, unknown item, missing language, unreadable and too large files, session and CSRF). `scripts/smoke.sh` also exports the landing page as XLIFF and imports it.
+
 `tests/flow.test.ts` runs the whole app (`createApp`) against the stand-ins with an in-memory store: OAuth and scopes, every kind (variants with modules, layout sections and HubL, primary language, blog without the language's variant, email copies and a sent copy, article translations, the knowledge base without its scopes), kept and updated versions, unmapped languages, token refresh and a revoked refresh token, disconnecting, the Commando Center events.
 
 ## Screenshots
@@ -177,7 +191,7 @@ The protocol itself (multipart, retries, polling, packing, language codes, error
 npm run docs:screenshots   # Playwright, 1× scale, into docs/images/
 ```
 
-`tests/docs/screenshots.ts` starts the stand-ins and the app in-process, connects through the stand-in's OAuth and captures the app's pages (connect, settings, translate page, results, list afterwards, update warning, email results, German UI). It also checks that every page fits a 390 px phone screen and fails if one is wider. Editor links point at app.hubspot.com, never at the stand-in. Regenerate them in the same commit as any UI change they show. Chromium: Playwright's own (`npx playwright install chromium`) or `CHROME=/path/to/chrome`. Screenshots of HubSpot's own screens (language settings, a translated variant in the page editor) follow from the demo account.
+`tests/docs/screenshots.ts` starts the stand-ins and the app in-process, connects through the stand-in's OAuth and captures the app's pages (connect, settings, translate page, results, list afterwards, update warning, email results, German UI, the export section, the import form and its summary: the landing page exported as HTML, filled with the sample German and imported). It also checks that every page fits a 390 px phone screen and fails if one is wider. Editor links point at app.hubspot.com, never at the stand-in. Regenerate them in the same commit as any UI change they show. Chromium: Playwright's own (`npx playwright install chromium`) or `CHROME=/path/to/chrome`. Screenshots of HubSpot's own screens (language settings, a translated variant in the page editor) follow from the demo account.
 
 ## CI
 
@@ -259,6 +273,7 @@ Never tag or create releases by hand.
   - the editor links for EU-hosted accounts (`app-eu1.hubspot.com`).
 - Text in templates, global content (headers, footers), forms, CTAs and HubDB isn't translated; HubSpot keeps those per language elsewhere.
 - A version removed after a failed translation is archived by HubSpot (`DELETE` archives pages, posts and emails); check whether an archived variant still blocks a new one in the same language.
+- Translation files: one item per export; no bulk export yet.
 - One item per job; bulk translation (several pages at once, a whole blog) comes later.
 - Jobs run inside the web process (one Railway instance); a restart marks a running job *interrupted*. A queue comes later.
 - No HubSpot App Marketplace listing yet; no app card or app home page inside HubSpot (the developer platform's UI extensions could add a *Translate with Supertext* card later).

@@ -11,12 +11,14 @@ import { localeFromRequest, translator, type Translator } from './i18n/index.js'
 import { Reporting } from './reporting.js';
 import { defaultAccount, type Account, type Store } from './store/store.js';
 import { SupertextClient } from './supertext/client.js';
+import { exportItem, importFile, MAX_UPLOAD_BYTES, tooLarge, type ImportResult } from './translation/files.js';
 import { startJob, type JobDeps } from './translation/jobs.js';
 import { hubspotCode, isLanguage, supertextCodeOf } from './translation/languages.js';
 import { ConnectPage } from './views/connect.js';
 import { JobPanel } from './views/job.js';
 import { appUrl, type PageContext } from './views/layout.js';
 import { KeyCheckMessage, keyCheckText, SettingsPage } from './views/settings.js';
+import { ImportPage } from './views/import.js';
 import { TranslatePage, type ItemRow } from './views/translate.js';
 
 export interface AppDeps {
@@ -319,6 +321,84 @@ export function createApp(deps: AppDeps) {
     });
   });
 
+  // --- Translation files ------------------------------------------------------
+
+  // Export for translation (from the Translate page): the item's texts as XLIFF 1.2 or HTML. No API key needed.
+  app.post('/api/export', async (c) => {
+    const session = await apiSession(c, true);
+    if (session instanceof Response) return session;
+    const { account } = session;
+    const body = (await c.req.json().catch(() => ({}))) as { kind?: string; itemId?: string; languages?: string[]; format?: string };
+    const languages = (body.languages ?? []).filter((code) => typeof code === 'string' && account.targets.includes(code));
+    const kind = typeof body.kind === 'string' && isKind(body.kind) ? body.kind : undefined;
+    if (!kind || !body.itemId || typeof body.itemId !== 'string' || languages.length === 0) {
+      return c.json({ error: { message: 'Select an item and at least one language.', code: 'select' } }, 400);
+    }
+    if (kind === 'kb-article' && !knowledgeBase(account)) {
+      return c.json({ error: { message: 'The knowledge base is not connected.', code: 'hubspotForbidden' } }, 400);
+    }
+    try {
+      const file = await exportItem(jobDeps, account, { kind, itemId: body.itemId, languages, format: body.format === 'html' ? 'html' : 'xliff' });
+      return new Response(file.body, {
+        headers: {
+          'Content-Type': file.contentType,
+          'Content-Disposition': `attachment; filename="${file.filename}"`,
+          'Cache-Control': 'no-store',
+        },
+      });
+    } catch (error) {
+      if (!(error instanceof LocalizedError)) console.error('Supertext: export failed', error);
+      const t = tr(c);
+      const info = errorInfo(error);
+      return c.json({ error: { ...info, message: t.error(info) } }, 400);
+    }
+  });
+
+  // Import translation: its own page (one file, at most 10 MB, read in memory and never stored).
+  const importPage = (c: Context, session: { account: Account; cookie: string }, extra: { results?: ImportResult[]; error?: ErrorInfo } = {}) =>
+    c.html(
+      page(
+        ImportPage({
+          ctx: pageContext(tr(c), 'import', session),
+          account: session.account,
+          appBase: editorBase,
+          ...extra,
+        }),
+      ),
+      extra.error ? 400 : 200,
+    );
+
+  app.get('/import', async (c) => {
+    const session = await current(c);
+    if (!session) return c.redirect('/', 302);
+    onRequest(session.account);
+    return importPage(c, session);
+  });
+
+  app.post('/import', async (c) => {
+    const session = await current(c);
+    if (!session) return c.redirect('/', 303);
+    try {
+      const raw = await readLimited(c.req.raw, MAX_UPLOAD_BYTES + 64 * 1024);
+      const form = await new Request(c.req.url, { method: 'POST', headers: { 'content-type': c.req.header('content-type') ?? '' }, body: raw }).formData();
+      if (!sessions.checkCsrf(session.cookie, String(form.get('csrf') ?? ''))) return c.redirect('/?error=session', 303);
+      const file = form.get('file');
+      if (!file || typeof file === 'string' || file.size === 0) {
+        throw new LocalizedError('Choose a file.', 'fileMissing');
+      }
+      if (file.size > MAX_UPLOAD_BYTES) throw tooLarge();
+      const results = await importFile(jobDeps, session.account, {
+        content: await file.text(),
+        includeChanged: form.get('includeChanged') === '1',
+        overwrite: form.get('overwrite') === '1',
+      });
+      return importPage(c, session, { results });
+    } catch (error) {
+      if (!(error instanceof LocalizedError)) console.error('Supertext: import failed', error);
+      return importPage(c, session, { error: errorInfo(error) });
+    }
+  });
+
   // --- Settings ----------------------------------------------------------------
 
   app.get('/settings', async (c) => {
@@ -395,6 +475,32 @@ export function createApp(deps: AppDeps) {
   });
 
   return app;
+}
+
+/** The request body, refused (`fileTooLarge`) when the Content-Length or the body itself is larger than `limit`. */
+async function readLimited(request: Request, limit: number): Promise<Uint8Array<ArrayBuffer>> {
+  if (Number(request.headers.get('content-length') ?? '0') > limit) throw tooLarge();
+  if (!request.body) return new Uint8Array(new ArrayBuffer(0));
+  const reader = request.body.getReader();
+  const chunks: Uint8Array[] = [];
+  let total = 0;
+  for (;;) {
+    const { done, value } = await reader.read();
+    if (done) break;
+    total += value.byteLength;
+    if (total > limit) {
+      await reader.cancel().catch(() => undefined);
+      throw tooLarge();
+    }
+    chunks.push(value);
+  }
+  const bytes = new Uint8Array(total);
+  let offset = 0;
+  for (const chunk of chunks) {
+    bytes.set(chunk, offset);
+    offset += chunk.byteLength;
+  }
+  return bytes;
 }
 
 /** A full HTML page from a JSX element. */
