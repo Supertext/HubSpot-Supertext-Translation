@@ -108,6 +108,9 @@ export const de: Messages = {
   'settings.languages.code': 'Supertext-Code',
   'settings.languages.codeHint':
     'Wählen Sie für jede Sprache, in welche Sprache Supertext übersetzt, zum Beispiel Schweizer Hochdeutsch (de-CH) für Deutsch. Die Varianten derselben Sprache stehen zuoberst. Vorausgewählt ist jeweils ein Vorschlag: derselbe Code, wo der HubSpot-Code bereits ein Supertext-Code ist (de-ch, es, nl), sonst die übliche Variante (Deutsch → de-DE, Englisch → en-US, Chinesisch (China) → zh-Hans, Spanisch (Mexiko) → es). Eine Sprache ohne Vorschlag zeigt — auswählen — und wird erst übersetzt, wenn Sie ihren Code wählen.',
+  'settings.languages.review': 'Übersetzungsprüfung',
+  'settings.languages.reviewHint':
+    'Übersetzungsprüfung: Übersetzungen in eine hier angekreuzte Sprache laufen über den Prüfdienst von Supertext, damit Prüferinnen und Prüfer sie mit der Erweiterung Supertext Localization Review direkt auf der Website kontrollieren und korrigieren können. Ihre Korrekturen werden beim nächsten Übersetzen des Inhalts in diese Sprache übernommen.',
   'settings.languages.suggested': 'Vorgeschlagen',
   'settings.languages.all': 'Alle Supertext-Sprachen',
   'settings.languages.search': 'Name oder Code eingeben',

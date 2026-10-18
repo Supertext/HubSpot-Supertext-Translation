@@ -21,6 +21,11 @@ export interface ClientOptions {
   apiKey: string;
   /** Default: the live API (https://api.supertext.com/v1/). Points at a stand-in in tests. */
   endpoint?: string;
+  /**
+   * The review service for languages with *Translation review* on (see `forReview`).
+   * '' or the same URL as `endpoint` = no review client.
+   */
+  reviewEndpoint?: string;
   pollIntervalMs?: number;
   pollTimeoutMs?: number;
   /** Injected for tests. */
@@ -49,13 +54,19 @@ export class SupertextError extends LocalizedError {
   public readonly status?: number;
 }
 
+const DEFAULT_ENDPOINT = 'https://api.supertext.com/v1/';
+const sameUrl = (a: string, b: string) => a.trim().replace(/\/+$/, '') === b.trim().replace(/\/+$/, '');
+
 export class SupertextClient {
   private readonly client: SdkClient;
+  private readonly options: ClientOptions;
+  private reviewClient?: SupertextClient;
 
   constructor(options: ClientOptions) {
     if (!options.apiKey?.trim()) {
       throw new SupertextError('No Supertext API key configured.', 'noApiKey');
     }
+    this.options = options;
     this.client = new SdkClient(options.apiKey, {
       baseUrl: options.endpoint || undefined,
       pollIntervalMs: options.pollIntervalMs,
@@ -64,6 +75,24 @@ export class SupertextClient {
       fetch: options.fetch as FetchLike | undefined,
       sleep: options.sleep,
     });
+  }
+
+  /** The base URL this client sends to. */
+  get endpoint(): string {
+    return this.options.endpoint || DEFAULT_ENDPOINT;
+  }
+
+  /**
+   * The client for a language: the review service when its *Translation review* is on (same key,
+   * timeouts, transport and User-Agent; created on first use), else this one. Without a review
+   * URL (or with the API's own URL), always this one. A translation is uploaded, polled,
+   * downloaded and deleted with the same client (`translateSegments` does all four).
+   */
+  forReview(review: boolean): SupertextClient {
+    const reviewUrl = this.options.reviewEndpoint?.trim() ?? '';
+    if (!review || !reviewUrl || sameUrl(reviewUrl, this.endpoint)) return this;
+    this.reviewClient ??= new SupertextClient({ ...this.options, endpoint: reviewUrl, reviewEndpoint: '' });
+    return this.reviewClient;
   }
 
   /**

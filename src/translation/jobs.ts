@@ -15,7 +15,8 @@ import { translateItem } from './translate.js';
 export interface JobDeps {
   store: Store;
   hubspot: (account: Account) => HubSpotClient;
-  supertext: (account: Account) => Pick<SupertextClient, 'translateSegments'>;
+  /** `forReview(true)`: the client for a language with Translation review on (the review service). */
+  supertext: (account: Account) => Pick<SupertextClient, 'translateSegments' | 'forReview'>;
   /** Supertext rejected the key (HTTP 401/403) during a translation: the Commando Center hears of it once. */
   onAuthenticationFailed?: (account: Account, httpStatus: number) => void;
 }
@@ -172,7 +173,8 @@ export async function runJob(deps: JobDeps, job: Job): Promise<Job> {
       const existingId = await existingVersion(prepared, kind, language);
       const result = await translateItem({
         client,
-        supertext,
+        // Translation review on for this language: through the review service, else directly.
+        supertext: supertext.forReview(account.reviewLanguages.includes(language)),
         kind,
         source,
         draft,

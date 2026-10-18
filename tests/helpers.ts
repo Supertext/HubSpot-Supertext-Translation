@@ -11,11 +11,15 @@ export function setup(env: Record<string, string> = {}) {
   const hubspot = createHubSpotStandin();
   const supertext = createSupertextStandin();
   const store = new MemoryStore();
+  /** Requests to Supertext and to the review service (review.test, the same stand-in): "METHOD host/path". */
+  const supertextRequests: string[] = [];
   const fetchFn = (async (input: string | URL | Request, init?: RequestInit) => {
     const request = new Request(input, init);
-    const host = new URL(request.url).host;
+    const url = new URL(request.url);
+    const host = url.host;
     if (host === 'hubspot.test') return hubspot.handle(request);
-    if (host === 'supertext.test' || host === 'center.test') return supertext.handle(request);
+    if (host === 'supertext.test' || host === 'review.test') supertextRequests.push(`${request.method} ${host}${url.pathname}`);
+    if (host === 'supertext.test' || host === 'review.test' || host === 'center.test') return supertext.handle(request);
     throw new Error(`Unexpected request to ${request.url}`);
   }) as typeof fetch;
   const config = loadConfig({
@@ -105,7 +109,7 @@ export function setup(env: Record<string, string> = {}) {
   const clearCookies = () => {
     cookies = {};
   };
-  return { app, hubspot, supertext, store, config, request, connect, csrf, api, saveSettings, translate, settle, onJob, fetchFn, clearCookies };
+  return { app, hubspot, supertext, supertextRequests, store, config, request, connect, csrf, api, saveSettings, translate, settle, onJob, fetchFn, clearCookies };
 }
 
 const PORTAL = '48210377';

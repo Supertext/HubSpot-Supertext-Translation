@@ -30,6 +30,11 @@ export interface Account {
    * as it is ("de-ch", "es"); otherwise it fails with `unsupportedLanguage`.
    */
   languageCodes: Record<string, string>;
+  /**
+   * HubSpot codes of the languages with *Translation review* on: translations into them go
+   * through Supertext's review service (SUPERTEXT_REVIEW_URL), the others directly to Supertext.
+   */
+  reviewLanguages: string[];
   /** "Send version information to Supertext" (SUPERTEXT_VERSION_REPORTS=0 turns it off for all accounts). */
   versionReports: boolean;
   /** The Commando Center reporter's state (Plugin Health's ReporterState JSON); see reporting.ts. */
@@ -49,6 +54,7 @@ export const defaultAccount = (accountId: string): Account => ({
   sourceLanguage: 'en',
   targets: [],
   languageCodes: {},
+  reviewLanguages: [],
   versionReports: true,
   reporter: null,
   connectedAt: new Date().toISOString(),

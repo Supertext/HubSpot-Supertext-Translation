@@ -23,7 +23,7 @@ src/
     jobs.ts               a job: one item × languages, progress, error handling
     languages.ts          HubSpot language codes, Supertext mapping, names
   supertext/
-    client.ts             the app's layer over the Supertext SDK: one client per account, SDK error codes → app errors
+    client.ts             the app's layer over the Supertext SDK: one client per account (forReview(): the review service client for languages with Translation review), SDK error codes → app errors
   store/
     store.ts              Store interface, in-memory store, AES-GCM for tokens and keys
     postgres.ts           PostgreSQL store (creates its database and tables)
@@ -100,6 +100,8 @@ The pages follow supertext.com: the deep-green header bar (`#003230`, rounded bo
 AI file translation API v1 at `https://api.supertext.com/v1/` (upload an HTML file, poll its status, download the translation, delete the file), handled entirely by the Supertext SDK: the `Supertext-Auth-Key` header (a pasted prefix is stripped), the multipart upload with a file part of type exactly `text/html`, HTTP 429 retries, polling every 2 s with a 3-minute timeout, the delete after every upload, the HTML packing (one `<div data-st-id="N">` per segment) and the language codes. See the SDK's [integration guide](https://github.com/Supertext/Supertext-API-SDK-and-Guide/blob/main/docs/integration-guide.md) and [API reference](https://github.com/Supertext/Supertext-API-SDK-and-Guide/blob/main/docs/api-reference.md).
 
 `src/supertext/client.ts` creates one SDK client per account with the key and the base URL (`SUPERTEXT_API_ENDPOINT` for stand-ins), sends `HubSpot-Supertext-Translation/<version>` in the User-Agent, and turns the SDK's error codes into the app's (`authentication_failure` → `auth`, `quota_exceeded` → `limitExceeded`, `invalid_language_pair` → `languagePair`, `unsupported_language` → `unsupportedLanguage`, `unsupported_feature` → `unsupportedFeature`, `transport_error` → `unreachable`, `incomplete_response` → `incomplete` …). *Test connection* and the automatic key check are the SDK's cost-free `checkApiKey()` (`GET features`). The key is the account's own (Settings, AES-256-GCM encrypted with `APP_ENCRYPTION_KEY`, else a key derived from `HUBSPOT_CLIENT_SECRET`), else `SUPERTEXT_API_KEY`.
+
+**Translation review** (`Account.reviewLanguages`, HubSpot codes, the checkbox per language under Settings → Languages; stored in the account's JSON, so existing accounts start with `[]` and need no migration): `jobs.ts` takes `supertext.forReview(account.reviewLanguages.includes(language))` for each language, a second SDK client with the same key, timeouts, fetch and User-Agent whose base URL is `SUPERTEXT_REVIEW_URL` (`Config.reviewUrl`, default `REVIEW_URL` in `src/config.ts`, the translation proxy of [Supertext Localization Review](https://github.com/Supertext/Localization-Review-Supertext-Translation)), created on first use. `translateSegments` uploads, polls, downloads and deletes with the same client, so a job is always collected where it was submitted. The proxy speaks the same API v1, forwards to the live Supertext API with the account's key, stores every segment per key and serves reviewers' corrections on the next upload, so nothing else changes in the app. `SUPERTEXT_REVIEW_URL=` (empty, or the same URL as the API) means `forReview()` always returns the direct client, and the settings page hides the column (saving then keeps the stored choice). The key check, *Test connection*, reports and file export/import never use the review service.
 
 ## Supertext SDK
 
@@ -179,11 +181,11 @@ npm run build
 bash scripts/smoke.sh   # after build: the built app against the stand-ins
 ```
 
-The protocol itself (multipart, retries, polling, packing, language codes, error mapping) is tested in the SDK repository against its shared test vectors.
+The protocol itself (multipart, retries, polling, packing, language codes, error mapping) is tested in the SDK repository against its shared test vectors. `tests/supertext.test.ts` covers the app's layer: error mapping, User-Agent, and `forReview` (all four calls to the review URL with the same key and User-Agent, one review client, none without a review URL or with the API's own URL).
 
 `tests/files.test.ts` covers translation files through the app against the stand-ins: the reference format; export (keys, mapped languages, HubL as codes, HTML with one language, no Supertext call); import (a new variant written as a draft, HubL lost → not imported, existing versions kept or updated with their own text where nothing is imported, `source_changed` only with the option, other system, other account, unknown item, missing language, unreadable and too large files, session and CSRF). `scripts/smoke.sh` also exports the landing page as XLIFF and imports it.
 
-`tests/flow.test.ts` runs the whole app (`createApp`) against the stand-ins with an in-memory store: OAuth and scopes, every kind (variants with modules, layout sections and HubL, primary language, blog without the language's variant, email copies and a sent copy, article translations, the knowledge base without its scopes), kept and updated versions, unmapped languages, token refresh and a revoked refresh token, disconnecting, the Commando Center events.
+`tests/flow.test.ts` runs the whole app (`createApp`) against the stand-ins with an in-memory store: OAuth and scopes, every kind (variants with modules, layout sections and HubL, primary language, blog without the language's variant, email copies and a sent copy, article translations, the knowledge base without its scopes), kept and updated versions, unmapped languages, Translation review (a ticked language goes to the review service for all four calls while the others go directly; an empty `SUPERTEXT_REVIEW_URL` turns it off; the default is Supertext's review service), token refresh and a revoked refresh token, disconnecting, the Commando Center events.
 
 ## Screenshots
 
@@ -191,7 +193,7 @@ The protocol itself (multipart, retries, polling, packing, language codes, error
 npm run docs:screenshots   # Playwright, 1× scale, into docs/images/
 ```
 
-`tests/docs/screenshots.ts` starts the stand-ins and the app in-process, connects through the stand-in's OAuth and captures the app's pages (connect, settings, translate page, results, list afterwards, update warning, email results, German UI, the export section, the import form and its summary: the landing page exported as HTML, filled with the sample German and imported). It also checks that every page fits a 390 px phone screen and fails if one is wider. Editor links point at app.hubspot.com, never at the stand-in. Regenerate them in the same commit as any UI change they show. Chromium: Playwright's own (`npx playwright install chromium`) or `CHROME=/path/to/chrome`. Screenshots of HubSpot's own screens (language settings, a translated variant in the page editor) follow from the demo account.
+`tests/docs/screenshots.ts` starts the stand-ins (the Supertext stand-in also as the review service, so nothing reaches the live one) and the app in-process, connects through the stand-in's OAuth and captures the app's pages (connect, settings, translate page, results, list afterwards, update warning, email results, German UI, the export section, the import form and its summary: the landing page exported as HTML, filled with the sample German and imported). It also checks that every page fits a 390 px phone screen and fails if one is wider. Editor links point at app.hubspot.com, never at the stand-in. Regenerate them in the same commit as any UI change they show. Chromium: Playwright's own (`npx playwright install chromium`) or `CHROME=/path/to/chrome`. Screenshots of HubSpot's own screens (language settings, a translated variant in the page editor) follow from the demo account.
 
 ## CI
 
@@ -220,6 +222,7 @@ The service **HubSpot** in the Railway project *supertext-cms-demos* (region `eu
 | `APP_ENCRYPTION_KEY` | random secret for stored tokens and keys; optional (falls back to the client secret) |
 | `SUPERTEXT_API_KEY` | optional default key (the demo account) |
 | `HUBSPOT_SCOPES`, `HUBSPOT_OPTIONAL_SCOPES` | optional; default `oauth content` and the knowledge base scopes |
+| `SUPERTEXT_REVIEW_URL` | optional; the review service for languages with *Translation review* on (default: Supertext's review service, `https://localizationreview-production.up.railway.app/v1/`; empty turns review off for every account) |
 | `SUPERTEXT_VERSION_REPORTS` | optional; `0` turns the version reports off for every account |
 | `SUPERTEXT_REPORT_URL` | optional; tests and stand-ins only (default: the live Commando Center) |
 
@@ -274,6 +277,7 @@ Never tag or create releases by hand.
 - Text in templates, global content (headers, footers), forms, CTAs and HubDB isn't translated; HubSpot keeps those per language elsewhere.
 - A version removed after a failed translation is archived by HubSpot (`DELETE` archives pages, posts and emails); check whether an archived variant still blocks a new one in the same language.
 - Translation files: one item per export; no bulk export yet.
+- Translation review: reviewers' corrections reach HubSpot only with the next translation (no push); the review service works only with live Supertext keys.
 - One item per job; bulk translation (several pages at once, a whole blog) comes later.
 - Jobs run inside the web process (one Railway instance); a restart marks a running job *interrupted*. A queue comes later.
 - No HubSpot App Marketplace listing yet; no app card or app home page inside HubSpot (the developer platform's UI extensions could add a *Translate with Supertext* card later).

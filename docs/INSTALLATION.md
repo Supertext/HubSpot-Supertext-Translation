@@ -51,7 +51,7 @@ Everyone in your team who connects the same HubSpot account shares its settings.
 
 Enter the API key, choose your languages and click **Save**. Saving checks the API key automatically (free of charge, nothing is translated) and shows the result under the key: *API key checked: the connection to Supertext works.* means everything is in place. **Test connection** runs the same check again, also for a key you have typed but not saved yet.
 
-<img src="images/settings.png" alt="Supertext settings: the saved API key with links to create a Supertext account and generate the key, the API key check result and Test connection, both saying the connection to Supertext works; the language of the content (English); German with the Supertext language German (Germany) (de-DE) in its dropdown, Italian (Switzerland), Swiss French and Swiss High German ticked with Italian (Switzerland) (it-CH), Swiss French (fr-CH) and Swiss High German (de-CH) preselected; the form of address; Send version information to Supertext; the interface language (automatic); the connected account swiss-chocolate.example with the knowledge base connected; and the version 0.1.0" width="720">
+<img src="images/settings.png" alt="Supertext settings: the saved API key with links to create a Supertext account and generate the key, the API key check result and Test connection, both saying the connection to Supertext works; the language of the content (English); German with the Supertext language German (Germany) (de-DE) in its dropdown, Italian (Switzerland), Swiss French and Swiss High German ticked with Italian (Switzerland) (it-CH), Swiss French (fr-CH) and Swiss High German (de-CH) preselected; the Translation review column with only Swiss High German ticked; the form of address; Send version information to Supertext; the interface language (automatic); the connected account swiss-chocolate.example with the knowledge base connected; and the version 0.1.0" width="720">
 
 <img src="images/settings-code-search.png" alt="The Supertext code of German being searched: ger typed in the field, the list shows Suggested: Austrian German de-AT, German (Germany) de-DE (the current choice, in bold), Swiss High German de-CH, Swiss German (Bern) and Swiss German (Zürich)" width="640">
 
@@ -62,6 +62,7 @@ Enter the API key, choose your languages and click **Save**. Saving checks the A
 | Language of your content | English | Used for items that have no language set in HubSpot (HubSpot needs it to make a language variant). Items that have one are translated from their own language. *Let Supertext detect it* lets Supertext find the language, but pages without a language then can't get variants. |
 | Translate into | none | The languages to translate into, as HubSpot codes (`de-ch`, `fr`, `en-gb` …): use the same languages as your website and blog variants in HubSpot. |
 | Supertext code | the suggestion (see below) | The language mapping: the code Supertext uses for this HubSpot language, chosen from a searchable dropdown of Supertext's languages: click it and type part of a name or code (`germ`, `de-ch`, `chin`), then pick one with a click or Enter (name and code, e.g. *Swiss High German (de-CH)*; the variants of the same language first, e.g. for German `de-CH`, `de-DE`, `de-AT` and Swiss German for Zürich and Bern). German, English, French, Italian and Portuguese have a region (`de-CH`, `de-DE`, `de-AT`, `en-US`, `en-GB`, `fr-CH`, `fr-FR`, `it-CH`, `it-IT`, `pt-BR`, `pt-PT`), Chinese and Serbian a script (`zh-Hans`, `zh-Hant`, `sr-Latn`, `sr-Cyrl`), Norwegian is `nb`; the others are the bare language (`es`, `nl`, `sl` …). Until you save a code, each dropdown preselects a suggestion, and a language nobody saved is translated with it: the same code where HubSpot's code is a Supertext code as it is (`de-ch` → `de-CH`, `es`, `nl`), else the default in the table below. A language with neither shows *— choose —* in orange, isn't translated (*has no Supertext code yet*) and the page warns about it while it is ticked. Saving stores the code shown in every dropdown. A code Supertext doesn't offer isn't saved (*Saved, except these codes …*). The same mapping gives the source language (`en-us` is sent as the source `en`). |
+| Translation review | off | A checkbox per language, next to its *Supertext code*: translations into a ticked language go through Supertext's review service, see [Translation review](#translation-review). |
 | Form of address | Let Supertext decide | *Formal* (German "Sie", French "vous") or *Informal* ("du", "tu"). Sent only for languages where Supertext offers it; the page names the ticked languages that don't have it, which are translated with Supertext's default. |
 | Send version information to Supertext | On | See *Version information* below. |
 | Interface language | Automatic | The language of the app's own pages: your browser's language, or English, Deutsch, Français or Italiano. Saved for this browser only, so each colleague can choose their own; it doesn't change which languages your content is translated into. |
@@ -77,6 +78,21 @@ Suggestions for HubSpot languages without an exact Supertext code (the Supertext
 | `en-au`, `en-ca`, `fr-be`, `fr-ca`, `no`, and languages Supertext doesn't offer (`ar`, `he`, `ro`, `uk`, `vi` …) | none: *— choose —* (choose one, e.g. `en-GB` for `en-au`, `fr-FR` for `fr-be`, `nb` for `no`) |
 
 The settings page also shows whether the knowledge base is connected and the app's version, linked to its release notes.
+
+## Translation review
+
+With **Translation review**, people check the translations on the website itself and correct them there: customers or Supertext linguists open the original and the translated page side by side in Chrome with the *Supertext Localization Review* extension and fix texts in a side panel. Their corrections come back into HubSpot.
+
+Turn it on per language that is translated **into**: **Settings → Languages**, tick **Translation review** in the language's row (next to its *Supertext code*) → **Save**. Untick it to turn it off again; nothing else changes.
+
+- Translations into that language then go through Supertext's review service instead of directly to Supertext. It answers exactly like Supertext and passes everything on with your API key, so billing, languages, formal/informal and error messages stay the same. The other languages keep going directly to Supertext.
+- The review service keeps every translation of your account. A text it has translated before gets the same translation again (without a new Supertext call), and once a reviewer has corrected it, the corrected text.
+- **Corrections arrive with the next translation:** after a review, translate the items into that language again with *Update existing versions* ticked to write the corrections into the drafts. As always, updating overwrites manual changes in the version's draft.
+- Reviewers get a review link for your site from Supertext; nothing to set up in HubSpot.
+- The review service works with keys of the **live** Supertext API.
+- *Export for translation* and *Import translation* don't use the review service. The API key check (and *Test connection*) still goes directly to Supertext.
+
+Supertext sets the review service's address on the server (`SUPERTEXT_REVIEW_URL`, default: Supertext's review service). If it is turned off there, the *Translation review* column isn't shown.
 
 ## Version information
 
@@ -125,6 +141,8 @@ Nothing to do: the app runs on Supertext's servers and is updated there. The set
 | *The API key couldn't be checked because Supertext can't be reached* | A network problem or a Supertext outage; the settings are saved. Click **Test connection** later. |
 | *The API key couldn't be checked: Supertext answered with an error (…)* | Supertext answered unexpectedly (the HTTP status is shown); the settings are saved. Try again later and contact Supertext support if it stays. |
 | *Authentication failed* | The key is wrong or revoked. Check it with **Test connection**; if needed, generate a new one at [supertext.com → Integrations → API](https://www.supertext.com/en/integrations/api) (Admin role required). |
+| *Authentication failed* only for languages with *Translation review* | The review service only works with keys of the live Supertext API; untick *Translation review* for those languages. |
+| Reviewers' corrections don't show up in HubSpot | They arrive with the next translation: translate the item into that language again with *Update existing versions* ticked. Check that the language's *Translation review* is ticked under Settings → Languages. |
 | *Choose your languages* | No languages are ticked under Settings → Languages. |
 | *These languages have no Supertext code yet …* / *The language “fr-be” has no Supertext code yet, so nothing was sent* | Choose the language's code in its *Supertext code* dropdown under Settings → Languages (it shows *— choose —*), for example `fr-FR` for `fr-be` (`unsupported_language`: nothing is sent to Supertext for that language until it has one). |
 | *Supertext doesn't know … as the language of your content* | Enter that language's Supertext code (e.g. `en-US` for English) or choose *Let Supertext detect it*. |
@@ -137,7 +155,7 @@ Nothing to do: the app runs on Supertext's servers and is updated there. The set
 
 ## Privacy and security
 
-- The texts you translate are sent to Supertext (api.supertext.com) and deleted there right after download (they expire after 24 hours anyway).
+- The texts you translate are sent to Supertext (api.supertext.com) and deleted there right after download (they expire after 24 hours anyway). For languages with [Translation review](#translation-review) on, they go through Supertext's review service, which keeps the translations so reviewers can correct them.
 - The app stores per HubSpot account: the account's ID and domain, the granted scopes, the OAuth tokens and the Supertext API key (both encrypted), the settings above, which email copy belongs to which email and language (and the IDs of the other versions it made), and the list of recent translations (item names and results). It doesn't store your content or any contact data.
 - With *Send version information to Supertext* on, the reports described under *Version information* go to Supertext's support center; never content, the API key or personal data.
 - The app reads content and creates and edits drafts of language versions. It never publishes a page or post and never sends an email.

@@ -73,6 +73,7 @@ Lessons from the live API, apply them here: header `Authorization: Supertext-Aut
 - Nothing is ever published or sent: the app only writes drafts.
 - Changes to HubSpot calls go through `src/hubspot/` and the stand-in (`tests/standin/hubspot.ts`) together. Check real HubSpot behaviour with `npm run hubspot:probe` before relying on it.
 - Tokens are written only by `Store.saveTokens`; access tokens are refreshed by `TokenManager`.
+- Translation review: the checkbox per language under Settings → Languages (`Account.reviewLanguages`) picks `SupertextClient.forReview()` (base URL `SUPERTEXT_REVIEW_URL`, default `REVIEW_URL` in `src/config.ts`); key check, reports and file export/import never use it.
 - New settings go in `src/store/store.ts` (`Account`), `src/views/settings.tsx`, the form handler in `src/app.ts` **and** the settings table in `docs/INSTALLATION.md`.
 - Every page and API call needs the session cookie; POSTs also the CSRF token (`src/auth/session.ts`).
 - The app definition (`hubspot-project/`) is uploaded by `.github/workflows/hubspot-app.yml` (by hand or when it changes on `main`); never change scopes or redirect URLs in HubSpot's UI only.

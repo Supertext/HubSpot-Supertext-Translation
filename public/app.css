@@ -159,6 +159,10 @@ td.lang { font-size: 12px; color: var(--muted); white-space: nowrap; }
 .combo-group { padding: 8px 12px 4px; font-size: 12px; font-weight: 600; text-transform: uppercase; letter-spacing: .04em; color: var(--muted); }
 .combo-empty { padding: 8px 12px; color: var(--muted); }
 .codes .hs-code { display: block; font-size: 12px; color: var(--muted); }
+/* Translation review: a checkbox per language; its label only where the table header is hidden (phones). */
+.codes th:nth-child(4), .codes td.review { text-align: center; white-space: nowrap; }
+.codes td.review label { display: inline-flex; align-items: center; gap: 6px; cursor: pointer; }
+.codes .review-label { display: none; }
 html { -webkit-text-size-adjust: 100%; }
 body { overflow-x: hidden; }
 
@@ -193,6 +197,9 @@ body { overflow-x: hidden; }
   .codes td:nth-child(2) { grid-area: name; }
   .codes td:nth-child(2) .hs-code { display: inline; margin-left: 6px; }
   .codes td:nth-child(3) { grid-area: code; }
+  .codes tr:has(td.review) { grid-template-areas: "check name" "check code" "check review"; }
+  .codes td.review { grid-area: review; text-align: left; }
+  .codes .review-label { display: inline; font-size: 14px; }
   .codes select, .combo { max-width: none; }
   .codes select, .combo-input { font-size: 16px; min-height: 40px; } /* 16px: no zoom on iPhone */
   table.results, table.results tbody { display: block; }

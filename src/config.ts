@@ -19,6 +19,11 @@ export interface Config {
   /** Default Supertext API key for accounts that haven't entered their own (the demo account). */
   supertextApiKey: string;
   supertextEndpoint: string;
+  /**
+   * SUPERTEXT_REVIEW_URL: the review service for languages with *Translation review* on
+   * (default: Supertext's review service, REVIEW_URL; '' turns review off for every language).
+   */
+  reviewUrl: string;
   databaseUrl: string;
   /** Key for encrypting stored tokens and API keys; falls back to a key derived from the client secret. */
   encryptionKey: string;
@@ -27,6 +32,14 @@ export interface Config {
   /** SUPERTEXT_REPORT_URL: where version reports go ('' = Plugin Health's default, the live Commando Center). Tests point it at a stand-in. */
   reportUrl: string;
 }
+
+/**
+ * Supertext's review service (the translation proxy of Supertext Localization Review): it speaks
+ * the same API v1, forwards to the live Supertext API with the account's key and keeps every
+ * translation, so reviewers can correct them on the website. Used for languages with
+ * *Translation review* on.
+ */
+export const REVIEW_URL = 'https://localizationreview-production.up.railway.app/v1/';
 
 export const DEFAULT_SCOPES = 'oauth content';
 export const DEFAULT_OPTIONAL_SCOPES = 'cms.knowledge_base.articles.read cms.knowledge_base.articles.write';
@@ -46,6 +59,7 @@ export function loadConfig(env: NodeJS.ProcessEnv = process.env): Config {
     sessionSecret: env.SESSION_SECRET ?? '',
     supertextApiKey: env.SUPERTEXT_API_KEY ?? '',
     supertextEndpoint: env.SUPERTEXT_API_ENDPOINT ?? '',
+    reviewUrl: (env.SUPERTEXT_REVIEW_URL ?? REVIEW_URL).trim(),
     databaseUrl: env.DATABASE_URL ?? '',
     encryptionKey: env.APP_ENCRYPTION_KEY ?? '',
     versionReports: env.SUPERTEXT_VERSION_REPORTS,

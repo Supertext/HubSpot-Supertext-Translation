@@ -1,5 +1,6 @@
 import { SDK_VERSION } from 'supertext-sdk';
 import { describe, expect, it } from 'vitest';
+import { REVIEW_URL } from '../src/config.js';
 import { PORTAL_ID, setup, STANDARD_SETTINGS } from './helpers.js';
 
 /** The language version of `sourceId` in `language`, as the stand-in has it now. */
@@ -302,6 +303,55 @@ describe('languages', () => {
     expect(row('fr-be')).toContain('<option value="" selected="">— choose —');
     expect(html).not.toContain('<datalist');
     expect(row('de')).toContain('data-combobox');
+  });
+});
+
+describe('Translation review', () => {
+  it('sends languages with review on through the review service (all four calls), the others directly', async () => {
+    const env = setup({ SUPERTEXT_REVIEW_URL: 'https://review.test/v1/' });
+    await env.connect();
+    await env.saveSettings([...STANDARD_SETTINGS, ['review', 'de-ch']]);
+    expect((await env.store.getAccount(PORTAL_ID))!.reviewLanguages).toEqual(['de-ch']);
+    const html = await (await env.request('/settings')).text();
+    expect(html).toContain('<th>Translation review</th>');
+    expect(html).toMatch(/name="review" value="de-ch" checked/);
+    expect(html).not.toMatch(/name="review" value="fr-ch" checked/);
+
+    env.supertextRequests.length = 0;
+    const { job } = await env.translate('site-page', '101', ['de-ch', 'fr-ch']);
+    expect(job.items.map((item) => item.state)).toEqual(['created', 'created']);
+    expect(version(env, 'site-page', '101', 'de-ch')!.name).toBe('Über uns');
+    const calls = (host: string) => env.supertextRequests.filter((call) => call.includes(` ${host}/`)).map((call) => call.replace(/\/[0-9a-f-]{8,}/, '/{id}'));
+    expect(calls('review.test')).toEqual([
+      'POST review.test/v1/translate/ai/file',
+      'GET review.test/v1/translate/ai/file/{id}/status',
+      'GET review.test/v1/translate/ai/file/{id}/translation',
+      'DELETE review.test/v1/translate/ai/file/{id}',
+    ]);
+    expect(calls('supertext.test').filter((call) => call.includes('/translate/'))).toEqual([
+      'POST supertext.test/v1/translate/ai/file',
+      'GET supertext.test/v1/translate/ai/file/{id}/status',
+      'GET supertext.test/v1/translate/ai/file/{id}/translation',
+      'DELETE supertext.test/v1/translate/ai/file/{id}',
+    ]);
+    expect(env.supertext.documents.map((d) => d.target)).toEqual(['de-CH', 'fr-CH']);
+  });
+
+  it('is off for every language with an empty SUPERTEXT_REVIEW_URL (no column, everything direct)', async () => {
+    const env = setup({ SUPERTEXT_REVIEW_URL: '' });
+    await env.connect();
+    await env.saveSettings([...STANDARD_SETTINGS, ['review', 'de-ch']]);
+    expect(await (await env.request('/settings')).text()).not.toContain('Translation review');
+    await env.translate('site-page', '101', ['de-ch']);
+    expect(env.supertextRequests.some((call) => call.includes('review.test'))).toBe(false);
+    expect(env.supertext.documents.map((d) => d.target)).toEqual(['de-CH']);
+  });
+
+  it("defaults to Supertext's review service, off for every language until ticked", async () => {
+    const env = setup({ SUPERTEXT_REVIEW_URL: undefined as unknown as string });
+    expect(env.config.reviewUrl).toBe(REVIEW_URL);
+    await env.connect();
+    expect((await env.store.getAccount(PORTAL_ID))!.reviewLanguages).toEqual([]);
   });
 });
 

@@ -35,6 +35,8 @@ async function main() {
   const supertext = createSupertextStandin();
   const hubspotUrl = await listen((request) => hubspot.handle(request));
   const supertextUrl = await listen((request) => supertext.handle(request));
+  // The review service for languages with Translation review on: the same stand-in, never the live one.
+  const reviewUrl = await listen((request) => supertext.handle(request));
   const port = 8790;
   const appUrl = `http://127.0.0.1:${port}`;
   const app = createApp({
@@ -45,6 +47,7 @@ async function main() {
       HUBSPOT_APP_BASE: hubspotUrl,
       HUBSPOT_API_BASE: hubspotUrl,
       SUPERTEXT_API_ENDPOINT: `${supertextUrl}/v1/`,
+      SUPERTEXT_REVIEW_URL: `${reviewUrl}/v1/`,
       // Version reports go to the stand-in, never to the live Commando Center.
       SUPERTEXT_REPORT_URL: `${supertextUrl}/report`,
     }),
@@ -70,6 +73,8 @@ async function main() {
   await page.fill('input[name="apiKey"]', 'Supertext-Auth-Key 0123456789abcdef');
   await page.selectOption('select[name="sourceLanguage"]', 'en');
   for (const code of ['de-ch', 'fr-ch', 'it-ch', 'de']) await page.check(`#t-${code}`);
+  // Translation review on for Swiss German.
+  await page.check('input[name="review"][value="de-ch"]');
   // The Supertext code is a searchable dropdown: type part of a name or code.
   const combo = page.locator('#targets tr:has(#t-de) .combo-input');
   await combo.click();

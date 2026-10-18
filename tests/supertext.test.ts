@@ -65,4 +65,40 @@ describe('the app layer over the Supertext SDK', () => {
     expect(error.code).toBe('languagePair');
     expect(error.params).toEqual({ source: 'en', target: 'xx-XX' });
   });
+
+  it('sends a review language to the review service with the same key and User-Agent, and only builds it once', async () => {
+    const seen: string[] = [];
+    let html = '';
+    const fetchFn = (async (url: string, init: RequestInit) => {
+      const headers = init.headers as Record<string, string>;
+      seen.push(`${init.method ?? 'GET'} ${url} ${headers.Authorization ?? headers.authorization} ${headers['User-Agent']}`);
+      if (init.method === 'POST') {
+        const form = await new Request(url, { method: 'POST', body: init.body, headers }).formData();
+        html = await (form.get('file') as File).text();
+        return Response.json({ file_id: 'f1' });
+      }
+      if (url.endsWith('/status')) return Response.json({ status: 'done' });
+      if (url.endsWith('/translation')) return new Response(html.replace(/>Hello</g, '>Hallo<'));
+      return Response.json({});
+    }) as unknown as typeof fetch;
+    const client = new SupertextClient({ apiKey: 'k', endpoint: 'https://api.test/v1', reviewEndpoint: 'https://review.test/v1/', fetch: fetchFn });
+    expect(client.forReview(false)).toBe(client);
+    const review = client.forReview(true);
+    expect(review).not.toBe(client);
+    expect(client.forReview(true)).toBe(review);
+    expect(await review.translateSegments(['Hello'], { targetLanguage: 'de-CH', sourceLanguage: 'en' })).toEqual(['Hallo']);
+    expect(seen.map((line) => line.split(' ').slice(0, 2).join(' '))).toEqual([
+      'POST https://review.test/v1/translate/ai/file',
+      'GET https://review.test/v1/translate/ai/file/f1/status',
+      'GET https://review.test/v1/translate/ai/file/f1/translation',
+      'DELETE https://review.test/v1/translate/ai/file/f1',
+    ]);
+    expect(seen.every((line) => line.includes('Supertext-Auth-Key k') && /HubSpot-Supertext-Translation\//.test(line))).toBe(true);
+  });
+
+  it('has no review client without a review URL or with the API URL itself', () => {
+    expect(new SupertextClient({ apiKey: 'k', reviewEndpoint: '' }).forReview(true).endpoint).toBe('https://api.supertext.com/v1/');
+    const same = new SupertextClient({ apiKey: 'k', endpoint: 'https://api.test/v1/', reviewEndpoint: 'https://api.test/v1' });
+    expect(same.forReview(true)).toBe(same);
+  });
 });

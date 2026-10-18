@@ -68,6 +68,8 @@ export interface SettingsPageProps {
   invalidCodes?: string;
   /** The account granted the knowledge base scopes. */
   knowledgeBase: boolean;
+  /** A review service is set (SUPERTEXT_REVIEW_URL not empty): show the Translation review column. */
+  review: boolean;
   /** This browser's interface language: chosen in the settings, or 'auto' (the browser's). */
   uiLanguage: 'auto' | (typeof LOCALES)[number];
 }
@@ -171,6 +173,7 @@ export function SettingsPage(props: SettingsPageProps) {
                 <th></th>
                 <th></th>
                 <th>{t.t('settings.languages.code')}</th>
+                {props.review && <th>{t.t('settings.languages.review')}</th>}
               </tr>
             </thead>
             <tbody>
@@ -215,11 +218,26 @@ export function SettingsPage(props: SettingsPageProps) {
                         <optgroup label={t.t('settings.languages.all')}>{others.map(option)}</optgroup>
                       </select>
                     </td>
+                    {props.review && (
+                      <td class="review">
+                        <label>
+                          <input
+                            type="checkbox"
+                            name="review"
+                            value={code}
+                            checked={account.reviewLanguages.includes(code)}
+                            aria-label={`${t.t('settings.languages.review')}: ${languageName(code, t.locale)}`}
+                          />
+                          <span class="review-label">{t.t('settings.languages.review')}</span>
+                        </label>
+                      </td>
+                    )}
                   </tr>
                 );
               })}
             </tbody>
           </table>
+          {props.review && <p class="help">{t.t('settings.languages.reviewHint')}</p>}
           <p class="help">{t.t('settings.languages.blogHint')}</p>
         </section>
 

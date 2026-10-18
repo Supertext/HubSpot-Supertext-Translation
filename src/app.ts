@@ -59,6 +59,8 @@ export function services(deps: AppDeps) {
     new SupertextClient({
       apiKey: account.apiKey || config.supertextApiKey,
       endpoint: config.supertextEndpoint || undefined,
+      // Languages with Translation review on go through the review service (see SupertextClient.forReview).
+      reviewEndpoint: config.reviewUrl,
       fetch: deps.fetch,
     });
   const reporting = new Reporting({ config, store: deps.store, fetch: deps.fetch, onTask: deps.onJob });
@@ -417,6 +419,7 @@ export function createApp(deps: AppDeps) {
           saved: c.req.query('saved') === '1',
           invalidCodes: c.req.query('invalid') || undefined,
           knowledgeBase: knowledgeBase(session.account),
+          review: config.reviewUrl !== '',
           uiLanguage: (() => {
             const chosen = getCookie(c, 'st_locale') ?? '';
             return /^(en|de|fr|it)$/.test(chosen) ? (chosen as 'en' | 'de' | 'fr' | 'it') : 'auto';
@@ -458,6 +461,11 @@ export function createApp(deps: AppDeps) {
       else invalid.push(code);
     }
     account.languageCodes = codes;
+    // Translation review per language (the column is only shown while a review service is set).
+    if (config.reviewUrl) {
+      const review = form.review === undefined ? [] : Array.isArray(form.review) ? form.review : [form.review];
+      account.reviewLanguages = [...new Set(review.map(String))].filter(isLanguage);
+    }
     if (!reporting.fixedByEnvironment) account.versionReports = field('versionReports') === '1';
 
     // The interface language belongs to this browser (each colleague picks their own), not to the account.
